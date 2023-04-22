@@ -21,9 +21,13 @@ export default function SelectField<T>({
       <label>{label}</label>
       <select
         className="border border-cyan-600 max-w-lg px-2 py-1 rounded-md"
-        placeholder={placeholder}
         onChange={(event) => onChange(event.target.value)}
       >
+        {placeholder && (
+          <option value="" disabled selected>
+            {placeholder}
+          </option>
+        )}
         {data.map((item) => (
           <option key={keyExtractor(item)} value={keyExtractor(item)}>
             {render(item)}
