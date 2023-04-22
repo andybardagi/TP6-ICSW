@@ -5,13 +5,15 @@ import { Order } from "@/models/Order";
 import { GetServerSideProps } from "next";
 import React, { useState } from "react";
 import SelectField from "@/components/forms/SelectField";
+import {PaymentMethod} from "@/models/PaymentMethod";
 import TextField from "@/components/forms/TextField";
 
 type NewOrderPageProps = {
   cities: City[];
+  paymentMethods: PaymentMethod[];
 };
 
-export default function NewOrderPage({ cities }: NewOrderPageProps) {
+export default function NewOrderPage({ cities, paymentMethods }: NewOrderPageProps) {
   const [order, setOrder] = useState<Order>({
     orderAmount: 0,
     paymentAmount: 0,
@@ -32,26 +34,35 @@ export default function NewOrderPage({ cities }: NewOrderPageProps) {
       reference: "",
     },
     orderDetails: "",
+    paymentMethod: { name: "", id: ""},
   });
 
   const handleLocationChange = (
-      value: string | City,
-      config: "deliveryLocation" | "pickupLocation",
-      attr: "street" | "number" | "reference" | "city",
+    value: string,
+    config: "deliveryLocation" | "pickupLocation",
+    attr: "street" | "number" | "reference"
   ) => {
     setOrder((o) => ({
       ...o,
-      [config]: {
-        ...o[config],
-        [attr]: value,
-        city: {
-          ...o[config].city,
-            name: (value as City).name,
-            id: (value as City).id,
-        },
-      },
+      [config]: { ...o[config], [attr]: value },
     }));
   };
+
+  const handleCityChange = (value: string, config: "deliveryLocation" | "pickupLocation") => {
+    const city = cities.find((c) => c.id === value);
+    setOrder((o) => ({
+      ...o,
+      [config]: { ...o[config], city: city ?? { name: '', id: '' } },
+    }));
+  }
+
+  const handlePaymentMethodChange = (value: string) => {
+    const paymentMethod = paymentMethods.find((c) => c.id === value);
+    setOrder((o) => ({
+      ...o,
+      paymentMethod: paymentMethod ?? { name: '', id: '' },
+    }));
+  }
 
   const getCityKey = (city: City) => city.id;
   const getCityName = (city: City) => city.name;
@@ -98,9 +109,8 @@ export default function NewOrderPage({ cities }: NewOrderPageProps) {
         />
         <SelectField
             onChange={(value) => {
-              const city = cities.find((c) => c.id === value);
-              handleLocationChange((city ?? ''), "pickupLocation", "city")
-              handleLocationChange((city ?? ''), "deliveryLocation", "city")
+              handleCityChange(value, "pickupLocation")
+              handleCityChange(value, "deliveryLocation")
             }}
             data={cities}
             keyExtractor={getCityKey}
@@ -137,25 +147,33 @@ export default function NewOrderPage({ cities }: NewOrderPageProps) {
           label="Ciudad"
           placeholder="Seleccione la ciudad del comercio"
         />
-        
+
       </Card>
       <Card title="Forma de pago">
-        {cities.map((c) => (
-          <p key={c.id}>
-            {c.name} - {c.id}
-          </p>
-        ))}
+        <SelectField
+            onChange={(value) => handlePaymentMethodChange(value)}
+            data={paymentMethods}
+            keyExtractor={(pm: PaymentMethod) => pm.id}
+            render={(pm: PaymentMethod) => pm.name}
+            label="Forma de pago"
+            placeholder="Seleccione la forma de pago"
+        />
       </Card>
     </div>
   );
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const resData = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/cities`);
-  const cities = await resData.json();
+  const citiesResData = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/cities`);
+  const cities = await citiesResData.json();
+
+  const paymentMethodsResData = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/payment/methods`);
+  const paymentMethods = await paymentMethodsResData.json();
+
   return {
     props: {
       cities,
+      paymentMethods,
     },
   };
 };
