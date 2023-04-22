@@ -1,4 +1,4 @@
-import {City} from "@/pages/api/cities/models/City";
+import {City} from "@/models/City";
 
 export const citiesArray: City[] = [
     new City("1", "Córdoba"),

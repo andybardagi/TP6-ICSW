@@ -1,9 +1,9 @@
 import {NextApiRequest, NextApiResponse} from "next";
-import {Order} from "@/pages/api/orders/models/Order";
-import saveOrder from "@/pages/api/orders/handlers/saveOrder";
 
-export default function handler(req: NextApiRequest, res: NextApiResponse<Order>) {
+export default function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     if (req.method === 'POST') {
-        return saveOrder(req, res);
+        return res.status(200).json({
+            message: 'Order saved successfully'
+        })
     }
 }

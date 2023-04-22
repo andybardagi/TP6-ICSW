@@ -1,4 +1,4 @@
-import {OrderStatus} from "@/pages/api/orders/models/OrderStatus";
+import {OrderStatus} from "@/models/OrderStatus";
 
 export class Order {
     constructor(
