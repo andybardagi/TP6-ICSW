@@ -34,13 +34,21 @@ export default function NewOrderPage({ cities }: NewOrderPageProps) {
   });
 
   const handleLocationChange = (
-    value: string,
-    config: "deliveryLocation" | "pickupLocation",
-    attr: "street" | "number" | "reference" | "city"
+      value: string | City,
+      config: "deliveryLocation" | "pickupLocation",
+      attr: "street" | "number" | "reference" | "city",
   ) => {
     setOrder((o) => ({
       ...o,
-      [config]: { ...o[config], [attr]: value },
+      [config]: {
+        ...o[config],
+        [attr]: value,
+        city: {
+          ...o[config].city,
+            name: (value as City).name,
+            id: (value as City).id,
+        },
+      },
     }));
   };
 
@@ -88,7 +96,10 @@ export default function NewOrderPage({ cities }: NewOrderPageProps) {
           placeholder="Ayuda al repartidor a encontrar el comercio"
         />
         <SelectField
-            onChange={(value) => handleLocationChange((value), "pickupLocation", "city")}
+            onChange={(value) => {
+              const city = cities.find((c) => c.id === value);
+              handleLocationChange((city ?? ''), "pickupLocation", "city")
+            }}
             data={cities}
             keyExtractor={getCityKey}
             render={getCityName}
