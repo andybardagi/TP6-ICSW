@@ -5,6 +5,7 @@ import { Order } from "@/models/Order";
 import { GetServerSideProps } from "next";
 import React, { useState } from "react";
 import SelectField from "@/components/forms/SelectField";
+import TextField from "@/components/forms/TextField";
 
 type NewOrderPageProps = {
   cities: City[];
@@ -99,6 +100,7 @@ export default function NewOrderPage({ cities }: NewOrderPageProps) {
             onChange={(value) => {
               const city = cities.find((c) => c.id === value);
               handleLocationChange((city ?? ''), "pickupLocation", "city")
+              handleLocationChange((city ?? ''), "deliveryLocation", "city")
             }}
             data={cities}
             keyExtractor={getCityKey}
@@ -130,9 +132,12 @@ export default function NewOrderPage({ cities }: NewOrderPageProps) {
           label="Referencia"
           placeholder="Ayuda al repartidor a encontrar tu domicilio"
         />
-        <label> Ciudad </label>
-        <input type="text" className="border border-cyan-600 max-w-lg px-2 py-1 rounded-md"
-        value={order.deliveryLocation.city.name}/>
+        <TextField
+          text={order.deliveryLocation.city.name}
+          label="Ciudad"
+          placeholder="Seleccione la ciudad del comercio"
+        />
+        
       </Card>
       <Card title="Forma de pago">
         {cities.map((c) => (
