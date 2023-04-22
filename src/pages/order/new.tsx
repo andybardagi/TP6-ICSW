@@ -130,6 +130,9 @@ export default function NewOrderPage({ cities }: NewOrderPageProps) {
           label="Referencia"
           placeholder="Ayuda al repartidor a encontrar tu domicilio"
         />
+        <label> Ciudad </label>
+        <input type="text" className="border border-cyan-600 max-w-lg px-2 py-1 rounded-md"
+        value={order.deliveryLocation.city.name}/>
       </Card>
       <Card title="Forma de pago">
         {cities.map((c) => (
