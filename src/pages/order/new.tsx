@@ -6,7 +6,7 @@ import { GetServerSideProps } from "next";
 import React, { useState } from "react";
 import SelectField from "@/components/forms/SelectField";
 import {PaymentMethod} from "@/models/PaymentMethod";
-import TextField from "@/components/forms/TextField";
+import {TextField} from "@/components/forms/TextField";
 
 type NewOrderPageProps = {
   cities: City[];

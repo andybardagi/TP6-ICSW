@@ -5,11 +5,7 @@ type TextProps = {
   placeholder?: string;
 };
 
-export default function InputField({
-    text,
-  label,
-  placeholder,
-}: TextProps) {
+export function TextField({text, label, placeholder}: TextProps) {
   return (
     <div className="flex flex-col gap-1">
       <label>{label}</label>
