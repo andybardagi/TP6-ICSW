@@ -4,6 +4,7 @@ import { City } from "@/models/City";
 import { Order } from "@/models/Order";
 import { GetServerSideProps } from "next";
 import React, { useState } from "react";
+import SelectField from "@/components/forms/SelectField";
 
 type NewOrderPageProps = {
   cities: City[];
@@ -35,13 +36,16 @@ export default function NewOrderPage({ cities }: NewOrderPageProps) {
   const handleLocationChange = (
     value: string,
     config: "deliveryLocation" | "pickupLocation",
-    attr: "street" | "number" | "reference"
+    attr: "street" | "number" | "reference" | "city"
   ) => {
     setOrder((o) => ({
       ...o,
       [config]: { ...o[config], [attr]: value },
     }));
   };
+
+  const getCityKey = (city: City) => city.id;
+  const getCityName = (city: City) => city.name;
 
   return (
     <div className="flex flex-col gap-4">
@@ -83,6 +87,14 @@ export default function NewOrderPage({ cities }: NewOrderPageProps) {
           label="Referencia"
           placeholder="Ayuda al repartidor a encontrar el comercio"
         />
+        <SelectField
+            onChange={(value) => handleLocationChange((value), "pickupLocation", "city")}
+            data={cities}
+            keyExtractor={getCityKey}
+            render={getCityName}
+            label="Ciudad"
+            placeholder="Seleccione la ciudad del comercio"
+        />
       </Card>
 
       <Card title="Direccion de entrega">
@@ -120,7 +132,6 @@ export default function NewOrderPage({ cities }: NewOrderPageProps) {
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  console.log(process.env.NEXT_PUBLIC_URL);
   const resData = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/cities`);
   const cities = await resData.json();
   return {
