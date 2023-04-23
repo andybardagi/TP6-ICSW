@@ -15,7 +15,7 @@ export const paymentMethodArray: PaymentMethod[] = [
       cardHolderName: '',
       expirationMonth: '',
       expirationYear: '',
-      cvv: ''
+      cvc: ''
     }
   }
 ];

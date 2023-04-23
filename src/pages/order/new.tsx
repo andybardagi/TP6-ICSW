@@ -40,7 +40,7 @@ export default function NewOrderPage({cities, paymentMethods}: NewOrderPageProps
       name: "",
       id: "",
       paymentType: PaymentType.Cash,
-      card: {cardNumber: "", cardHolderName: "", expirationMonth: "", cvv: "", expirationYear: ""}
+      card: {cardNumber: "", cardHolderName: "", expirationMonth: "", cvc: "", expirationYear: ""}
     },
   });
 
@@ -75,7 +75,7 @@ export default function NewOrderPage({cities, paymentMethods}: NewOrderPageProps
 
   const handleCreditCardInfoChange = (
     value: string | number,
-    atr: "cardHolderName" | "cardNumber" | "expirationMonth" | "expirationYear" | "cvv"
+    atr: "cardHolderName" | "cardNumber" | "expirationMonth" | "expirationYear" | "cvc"
   ) => {
     setOrder((prevOrder) => {
       if (!prevOrder.paymentMethod.card) return prevOrder
@@ -96,7 +96,7 @@ export default function NewOrderPage({cities, paymentMethods}: NewOrderPageProps
   const getCityName = (city: City) => city.name;
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 p-5">
       <h1 className="text-2xl font-bold mt-2 mb-0">Nuevo pedido</h1>
       <Card title="Productos">
         <InputField
@@ -202,47 +202,64 @@ export default function NewOrderPage({cities, paymentMethods}: NewOrderPageProps
       {(order.paymentMethod.paymentType === PaymentType.Card) && (
         <Card title={'Datos de la tarjeta'}>
           <div className="flex flex-row gap-1">
-            <form onFocus={(e) => console.log(e)}>
+            <form onFocus={(e) => setFocused(e.target.name as "name" | "number" | "expiry" | "cvc" | undefined)}>
               <InputField
                 onChange={(value) => handleCreditCardInfoChange(value, 'cardNumber')}
                 label="Número de tarjeta"
                 placeholder="Indique el número de la tarjeta"
+                name='number'
+                type='number'
               />
               <InputField
                 onChange={(value) => handleCreditCardInfoChange(value, 'cardHolderName')}
                 label="Nombre del titular"
                 placeholder="Indique el nombre del titular de la tarjeta"
+                name='name'
               />
               <div className="flex flex-row gap-1">
                 <InputField
                   onChange={(value) => handleCreditCardInfoChange(value, 'expirationMonth')}
-                  label="Mes de vencimiento"
-                  placeholder="MM"
+                  label='Mes de vencimiento'
+                  placeholder='MM'
+                  name='expiry'
+                  maxLength={2}
                 />
                 <InputField
                   onChange={(value) => handleCreditCardInfoChange(value, 'expirationYear')}
                   label="Año de vencimiento"
                   placeholder="AA"
+                  name='expiry'
+                  maxLength={2}
                 />
               </div>
               <InputField
-                onChange={(value) => handleCreditCardInfoChange(value, 'cvv')}
-                label="CVV"
-                placeholder="Indique el CVV de la tarjeta"
+                onChange={(value) => handleCreditCardInfoChange(value, 'cvc')}
+                label='CVC'
+                placeholder='Indique el CVV de la tarjeta'
+                name='cvc'
+                maxLength={3}
               />
             </form>
             {order.paymentMethod.card && (
-              <Cards
-                cvc={order.paymentMethod.card.cvv}
-                expiry={order.paymentMethod.card.expirationMonth + '/' + order.paymentMethod.card.expirationYear}
-                focused={focused}
-                name={order.paymentMethod.card.cardHolderName}
-                number={order.paymentMethod.card.cardNumber}
-              />
+              <div className="m-auto">
+                <Cards
+                  cvc={order.paymentMethod.card.cvc}
+                  expiry={order.paymentMethod.card.expirationMonth + '/' + order.paymentMethod.card.expirationYear}
+                  focused={focused}
+                  name={order.paymentMethod.card.cardHolderName}
+                  number={order.paymentMethod.card.cardNumber}
+                  acceptedCards={['visa']}
+                />
+              </div>
             )}
           </div>
         </Card>
       )}
+      <div className="flex flex-col gap-1 items-end">
+        <label htmlFor="file" className="bg-cyan-600 px-4 py-2 text-white rounded-lg hover:bg-cyan-500 w-fit">
+          <button onClick={() => console.log(order)}>Crear pedido</button>
+        </label>
+      </div>
     </div>
   );
 }
