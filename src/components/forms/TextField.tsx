@@ -12,7 +12,7 @@ export function TextField({text, label, placeholder}: TextProps) {
       <input
         className="border border-cyan-600 max-w-lg px-2 py-1 rounded-md"
         placeholder={placeholder}
-        value={text}
+        value={text || placeholder}
       />
     </div>
   );

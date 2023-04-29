@@ -32,13 +32,13 @@ export default function NewOrderPage({
     deliveryLocation: {
       street: "",
       number: 0,
-      city: { name: "", id: "" },
+      city: { name: "", id: "", latitud: 0, longitud: 0 },
       reference: "",
     },
     pickupLocation: {
       street: "",
       number: 0,
-      city: { name: "", id: "" },
+      city: { name: "", id: "", latitud: 0, longitud: 0 },
       reference: "",
     },
     orderDetails: "",
@@ -61,9 +61,18 @@ export default function NewOrderPage({
     config: "deliveryLocation" | "pickupLocation"
   ) => {
     const city = cities.find((c) => c.id === value);
+    setLatitud(city?.latitud || 0);
+    setLongitud(city?.longitud || 0);
+    setSelectValueCity(city?.name || "" );
+    //console.log(address?.latitud || "nada")
+    //console.log(address?.longitud || "nada")
+    console.log(city?.name || "nada")
     setOrder((o) => ({
       ...o,
-      [config]: { ...o[config], city: city ?? { name: "", id: "" } },
+      [config]: {
+        ...o[config],
+        city: city ?? { name: "", id: "", latitud: 0, longitud: 0 },
+      },
     }));
   };
 
@@ -77,6 +86,41 @@ export default function NewOrderPage({
 
   const getCityKey = (city: City) => city.id;
   const getCityName = (city: City) => city.name;
+
+  const handleMapClick = async (lat: number, lng: number) => {
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`
+    );
+    const data = await response.json();
+    const { address } = data;    
+    setAddress({ latitud: lat, longitud: lng });
+    const city = cities.find((c) => c.name === address?.city);
+    handleCityChange(city?.name || "", "pickupLocation");  
+    handleCityChange(city?.name || "", "deliveryLocation");  
+    setSelectValueCity(city?.name || "");
+    handleLocationChange(address?.road || "", "pickupLocation", "street");
+    setInputValueStreet(address?.road || "");
+    handleLocationChange(address?.house_number || "", "pickupLocation", "number");
+    setInputValueNumber(address?.house_number || "");
+    //console.log(city?.name || "nadaaaaaaaaaaaaa")
+    setLatitud(lat);
+    setLongitud(lng);
+    console.log(latitud || "nadaaaaaaa")
+    console.log(longitud || "nadaaaaaaa")
+    console.log(city?.name || "nadaaaaaaa")
+  };
+
+  const [address, setAddress] = useState<Address>({
+    latitud: -31.416668,
+    longitud: -64.183334,
+  });
+
+  const [inputValueStreet, setInputValueStreet] = useState("");
+  const [inputValueNumber, setInputValueNumber] = useState("");
+  const [selectValueNumber, setSelectValueCity] = useState("");
+
+  const [latitud, setLatitud] = useState(-31.416668);
+  const [longitud, setLongitud] = useState(-64.183334);
 
   return (
     <div className="flex flex-col gap-4">
@@ -112,6 +156,7 @@ export default function NewOrderPage({
               render={getCityName}
               label="Ciudad"
               placeholder="Seleccione la ciudad del comercio"
+              //value={selectValueNumber}
             />
 
             <InputField
@@ -120,6 +165,7 @@ export default function NewOrderPage({
               }
               label="Calle del comercio"
               placeholder="Indique la calle del local de su pedido"
+              value={inputValueStreet}
             />
             <InputField
               onChange={(value) =>
@@ -127,6 +173,7 @@ export default function NewOrderPage({
               }
               label="Número del comercio"
               placeholder="Indique el número de la calle de su comercio"
+              value={inputValueNumber}
             />
             <InputField
               onChange={(value) =>
@@ -138,7 +185,14 @@ export default function NewOrderPage({
           </div>
 
           <div className="w-full">
-            <MapView />
+            <MapView
+              onChange={(lat, lng) =>
+                handleMapClick(lat, lng)
+              }
+              latitud={latitud}
+              longitud={longitud}
+              address={address}
+            />
           </div>
         </div>
       </Card>
