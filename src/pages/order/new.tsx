@@ -9,15 +9,9 @@ import { PaymentMethod } from "@/models/PaymentMethod";
 import { TextField } from "@/components/forms/TextField";
 import dynamic from "next/dynamic";
 
-const MapView = dynamic(
-  () => {
-    console.log("hola");
-    return import("@/components/map/MapView");
-  },
-  {
-    ssr: false,
-  }
-);
+const MapView = dynamic(() => import("../../components/map/MapView"), {
+  ssr: false,
+});
 
 type NewOrderPageProps = {
   cities: City[];
@@ -104,43 +98,49 @@ export default function NewOrderPage({
           <input id="file" type="file" className="max-w-lg hidden" />
         </div>
       </Card>
-      <div className="w-3xl h-3xl">
-        <MapView />
-      </div>
 
       <Card title="Direccion de comercio">
-        <InputField
-          onChange={(value) =>
-            handleLocationChange(value, "pickupLocation", "street")
-          }
-          label="Calle del comercio"
-          placeholder="Indique la calle del local de su pedido"
-        />
-        <InputField
-          onChange={(value) =>
-            handleLocationChange(value, "pickupLocation", "number")
-          }
-          label="Número del comercio"
-          placeholder="Indique el número de la calle de su comercio"
-        />
-        <InputField
-          onChange={(value) =>
-            handleLocationChange(value, "pickupLocation", "reference")
-          }
-          label="Referencia"
-          placeholder="Ayuda al repartidor a encontrar el comercio"
-        />
-        <SelectField
-          onChange={(value) => {
-            handleCityChange(value, "pickupLocation");
-            handleCityChange(value, "deliveryLocation");
-          }}
-          data={cities}
-          keyExtractor={getCityKey}
-          render={getCityName}
-          label="Ciudad"
-          placeholder="Seleccione la ciudad del comercio"
-        />
+        <div className="lg:flex-row lg:gap-2 flex flex-col gap-3">
+          <div className="flex flex-col gap-3 w-full">
+            <SelectField
+              onChange={(value) => {
+                handleCityChange(value, "pickupLocation");
+                handleCityChange(value, "deliveryLocation");
+              }}
+              data={cities}
+              keyExtractor={getCityKey}
+              render={getCityName}
+              label="Ciudad"
+              placeholder="Seleccione la ciudad del comercio"
+            />
+
+            <InputField
+              onChange={(value) =>
+                handleLocationChange(value, "pickupLocation", "street")
+              }
+              label="Calle del comercio"
+              placeholder="Indique la calle del local de su pedido"
+            />
+            <InputField
+              onChange={(value) =>
+                handleLocationChange(value, "pickupLocation", "number")
+              }
+              label="Número del comercio"
+              placeholder="Indique el número de la calle de su comercio"
+            />
+            <InputField
+              onChange={(value) =>
+                handleLocationChange(value, "pickupLocation", "reference")
+              }
+              label="Referencia"
+              placeholder="Ayuda al repartidor a encontrar el comercio"
+            />
+          </div>
+
+          <div className="w-full">
+            <MapView />
+          </div>
+        </div>
       </Card>
 
       <Card title="Direccion de entrega">
