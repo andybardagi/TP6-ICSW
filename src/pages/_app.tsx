@@ -9,6 +9,7 @@ const inter = Inter({
   subsets: ["latin"],
 });
 
+
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <div style={inter.style} >
