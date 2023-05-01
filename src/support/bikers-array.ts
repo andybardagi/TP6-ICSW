@@ -1,4 +1,4 @@
-import {Biker} from "@/models/Biker";
+import { Biker } from '@/models/Biker';
 
 export const bikersArray: Biker[] = [
     {

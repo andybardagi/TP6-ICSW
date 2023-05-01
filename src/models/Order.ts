@@ -1,6 +1,6 @@
-import {OrderStatus} from "@/models/OrderStatus";
-import {Location} from "@/models/Location";
-import {PaymentMethod} from "@/models/PaymentMethod";
+import { OrderStatus } from '@/models/OrderStatus';
+import { Location } from '@/models/Location';
+import { PaymentMethod } from '@/models/PaymentMethod';
 
 export class Order {
     constructor(

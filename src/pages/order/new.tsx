@@ -1,18 +1,18 @@
-import InputField from "@/components/forms/InputField";
-import Card from "@/components/layout/Card";
-import { City } from "@/models/City";
-import { Order } from "@/models/Order";
-import React, { useState } from "react";
-import SelectField from "@/components/forms/SelectField";
-import { PaymentMethod, PaymentType } from "@/models/PaymentMethod";
-import { TextField } from "@/components/forms/TextField";
-import { GetServerSideProps } from "next";
+import InputField from '@/components/forms/InputField';
+import Card from '@/components/layout/Card';
+import { City } from '@/models/City';
+import { Order } from '@/models/Order';
+import React, { useState } from 'react';
+import SelectField from '@/components/forms/SelectField';
+import { PaymentMethod, PaymentType } from '@/models/PaymentMethod';
+import { TextField } from '@/components/forms/TextField';
+import { GetServerSideProps } from 'next';
 import Cards from 'react-credit-cards';
 import 'react-credit-cards/es/styles-compiled.css';
-import dynamic from "next/dynamic";
-import { calculateOrderAmount } from "@/helpers/calculateOrderAmount";
+import dynamic from 'next/dynamic';
+import { calculateOrderAmount } from '@/helpers/calculateOrderAmount';
 
-const MapView = dynamic(() => import("../../components/map/MapView"), {
+const MapView = dynamic(() => import('../../components/map/MapView'), {
   ssr: false,
 });
 
@@ -30,32 +30,32 @@ export default function NewOrderPage({ cities, paymentMethods }: NewOrderPagePro
     asap: true,
     deliveryDate: new Date(),
     deliveryLocation: {
-      street: "",
+      street: '',
       number: 0,
-      city: { name: "", id: "", latitud: 0, longitud: 0 },
-      reference: "",
+      city: { name: '', id: '', latitud: 0, longitud: 0 },
+      reference: '',
     },
     pickupLocation: {
-      street: "",
+      street: '',
       number: 0,
-      city: { name: "", id: "", latitud: 0, longitud: 0 },
-      reference: "",
+      city: { name: '', id: '', latitud: 0, longitud: 0 },
+      reference: '',
     },
-    orderDetails: "",
+    orderDetails: '',
     paymentMethod: {
-      name: "",
-      id: "",
+      name: '',
+      id: '',
       paymentType: PaymentType.Cash,
-      card: { cardNumber: "", cardHolderName: "", expirationMonth: "", cvc: "", expirationYear: "" }
+      card: { cardNumber: '', cardHolderName: '', expirationMonth: '', cvc: '', expirationYear: '' }
     },
   });
 
-  const [focused, setFocused] = useState<"name" | "number" | "expiry" | "cvc" | undefined>(undefined);
+  const [focused, setFocused] = useState<'name' | 'number' | 'expiry' | 'cvc' | undefined>(undefined);
 
   const handleLocationChange = (
     value: string,
-    config: "deliveryLocation" | "pickupLocation",
-    attr: "street" | "number" | "reference"
+    config: 'deliveryLocation' | 'pickupLocation',
+    attr: 'street' | 'number' | 'reference'
   ) => {
     setOrder((o) => ({
       ...o,
@@ -63,16 +63,16 @@ export default function NewOrderPage({ cities, paymentMethods }: NewOrderPagePro
     }));
   };
 
-  const handleCityChange = (value: string, config: "deliveryLocation" | "pickupLocation") => {
+  const handleCityChange = (value: string, config: 'deliveryLocation' | 'pickupLocation') => {
     const city = cities.find((c) => c.id === value);
     setLatitud(city?.latitud || 0);
     setLongitud(city?.longitud || 0);
-    setSelectValueCity(city?.name || "" );
+    setSelectValueCity(city?.name || '' );
     setOrder((o) => ({
       ...o,
       [config]: {
         ...o[config],
-        city: city ?? { name: "", id: "", latitud: 0, longitud: 0 },
+        city: city ?? { name: '', id: '', latitud: 0, longitud: 0 },
       },
     }));
   };
@@ -87,7 +87,7 @@ export default function NewOrderPage({ cities, paymentMethods }: NewOrderPagePro
 
   const handleCreditCardInfoChange = (
     value: string | number,
-    atr: "cardHolderName" | "cardNumber" | "expirationMonth" | "expirationYear" | "cvc"
+    atr: 'cardHolderName' | 'cardNumber' | 'expirationMonth' | 'expirationYear' | 'cvc'
   ) => {
     setOrder((prevOrder) => {
       if (!prevOrder.paymentMethod.card) return prevOrder
@@ -113,13 +113,13 @@ export default function NewOrderPage({ cities, paymentMethods }: NewOrderPagePro
     const { address } = data;
     setAddress({ latitud: lat, longitud: lng });
     const city = cities.find((c) => c.name === address?.city);
-    handleCityChange(city?.name || "", "pickupLocation");
-    handleCityChange(city?.name || "", "deliveryLocation");
-    setSelectValueCity(city?.name || "");
-    handleLocationChange(address?.road || "", "pickupLocation", "street");
-    setInputValueStreet(address?.road || "");
-    handleLocationChange(address?.house_number || "", "pickupLocation", "number");
-    setInputValueNumber(address?.house_number || "");
+    handleCityChange(city?.name || '', 'pickupLocation');
+    handleCityChange(city?.name || '', 'deliveryLocation');
+    setSelectValueCity(city?.name || '');
+    handleLocationChange(address?.road || '', 'pickupLocation', 'street');
+    setInputValueStreet(address?.road || '');
+    handleLocationChange(address?.house_number || '', 'pickupLocation', 'number');
+    setInputValueNumber(address?.house_number || '');
     setLatitud(lat);
     setLongitud(lng);
   };
@@ -129,9 +129,9 @@ export default function NewOrderPage({ cities, paymentMethods }: NewOrderPagePro
     longitud: -64.183334,
   });
 
-  const [inputValueStreet, setInputValueStreet] = useState("");
-  const [inputValueNumber, setInputValueNumber] = useState("");
-  const [selectValueNumber, setSelectValueCity] = useState("");
+  const [inputValueStreet, setInputValueStreet] = useState('');
+  const [inputValueNumber, setInputValueNumber] = useState('');
+  const [selectValueNumber, setSelectValueCity] = useState('');
 
   const [latitud, setLatitud] = useState(-31.416668);
   const [longitud, setLongitud] = useState(-64.183334);
@@ -165,8 +165,8 @@ export default function NewOrderPage({ cities, paymentMethods }: NewOrderPagePro
           <div className="flex flex-col gap-3 w-full">
             <SelectField
               onChange={(value) => {
-                handleCityChange(value, "pickupLocation");
-                handleCityChange(value, "deliveryLocation");
+                handleCityChange(value, 'pickupLocation');
+                handleCityChange(value, 'deliveryLocation');
               }}
               data={cities}
               keyExtractor={(city) => city.id}
@@ -177,7 +177,7 @@ export default function NewOrderPage({ cities, paymentMethods }: NewOrderPagePro
 
             <InputField
               onChange={(value) =>
-                handleLocationChange(value, "pickupLocation", "street")
+                handleLocationChange(value, 'pickupLocation', 'street')
               }
               label="Calle del comercio"
               placeholder="Indique la calle del local de su pedido"
@@ -185,7 +185,7 @@ export default function NewOrderPage({ cities, paymentMethods }: NewOrderPagePro
             />
             <InputField
               onChange={(value) =>
-                handleLocationChange(value, "pickupLocation", "number")
+                handleLocationChange(value, 'pickupLocation', 'number')
               }
               label="Número del comercio"
               placeholder="Indique el número de la calle de su comercio"
@@ -193,7 +193,7 @@ export default function NewOrderPage({ cities, paymentMethods }: NewOrderPagePro
             />
             <InputField
               onChange={(value) =>
-                handleLocationChange(value, "pickupLocation", "reference")
+                handleLocationChange(value, 'pickupLocation', 'reference')
               }
               label="Referencia"
               placeholder="Ayuda al repartidor a encontrar el comercio"
@@ -216,21 +216,21 @@ export default function NewOrderPage({ cities, paymentMethods }: NewOrderPagePro
       <Card title="Direccion de entrega">
         <InputField
           onChange={(value) =>
-            handleLocationChange(value, "deliveryLocation", "street")
+            handleLocationChange(value, 'deliveryLocation', 'street')
           }
           label="Calle del entrega"
           placeholder="Indique la calle donde debe ser entregado el pedido"
         />
         <InputField
           onChange={(value) =>
-            handleLocationChange(value, "deliveryLocation", "number")
+            handleLocationChange(value, 'deliveryLocation', 'number')
           }
           label="Número de la calle"
           placeholder="Indique el número de la calle donde debe ser entregado el pedido"
         />
         <InputField
           onChange={(value) =>
-            handleLocationChange(value, "pickupLocation", "reference")
+            handleLocationChange(value, 'pickupLocation', 'reference')
           }
           label="Referencia"
           placeholder="Ayuda al repartidor a encontrar tu domicilio"
@@ -270,7 +270,7 @@ export default function NewOrderPage({ cities, paymentMethods }: NewOrderPagePro
       {(order.paymentMethod.paymentType === PaymentType.Card) && (
         <Card title={'Datos de la tarjeta'}>
           <div className="flex flex-row gap-1">
-            <form onFocus={(e) => setFocused(e.target.name as "name" | "number" | "expiry" | "cvc" | undefined)}>
+            <form onFocus={(e) => setFocused(e.target.name as 'name' | 'number' | 'expiry' | 'cvc' | undefined)}>
               <InputField
                 onChange={(value) => handleCreditCardInfoChange(value, 'cardNumber')}
                 label="Número de tarjeta"

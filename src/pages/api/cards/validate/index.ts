@@ -1,5 +1,5 @@
-import {NextApiRequest, NextApiResponse} from "next";
-import {ValidateCardDTO} from "@/models/ValidateCardDTO";
+import { NextApiRequest, NextApiResponse } from 'next';
+import { ValidateCardDTO } from '@/models/ValidateCardDTO';
 const cardValidator = require('card-validator');
 
 export default function handler(req: NextApiRequest, res: NextApiResponse<ValidateCardDTO>) {

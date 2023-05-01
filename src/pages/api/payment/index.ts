@@ -1,5 +1,5 @@
-import {NextApiRequest, NextApiResponse} from "next";
-import {PaymentResult} from "@/models/PaymentResult";
+import { NextApiRequest, NextApiResponse } from 'next';
+import { PaymentResult } from '@/models/PaymentResult';
 
 
 export default function handler(req: NextApiRequest, res: NextApiResponse<PaymentResult>) {

@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 type InputProps = {
   onChange: (value: string) => void;
   label?: string;
@@ -16,7 +16,7 @@ export default function InputField({
   value,
   name,
   maxLength,
-  type = "text",
+  type = 'text',
 }: InputProps) {
   return (
     <div className="flex flex-col gap-1">

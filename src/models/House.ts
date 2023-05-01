@@ -1,4 +1,4 @@
-import { City } from "@/models/City";
+import { City } from '@/models/City';
 
 export class House {
   constructor(

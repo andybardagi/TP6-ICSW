@@ -1,9 +1,9 @@
-import React, { useState, useRef } from "react";
-import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
-import L from "leaflet";
-import { BsFillPinFill } from "react-icons/bs";
-import ReactDOMServer from "react-dom/server";
+import React, { useState, useRef } from 'react';
+import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+import { BsFillPinFill } from 'react-icons/bs';
+import ReactDOMServer from 'react-dom/server';
 
 interface MapViewProps {
   onChange: (lat: number, lng: number) => void;
@@ -18,7 +18,7 @@ const MapView = ({ onChange, latitud, longitud, address }: MapViewProps) => {
   const ZOOM_LEVEL = 10;
   const mapRef = useRef<L.Map>(null);
   const icon = L.divIcon({
-    className: "custom-icon",
+    className: 'custom-icon',
     html: ReactDOMServer.renderToString(
       <BsFillPinFill className="text-3xl text-red-800" />
     ),
@@ -29,8 +29,8 @@ const MapView = ({ onChange, latitud, longitud, address }: MapViewProps) => {
       click(e: L.LeafletMouseEvent) {
         const { lat, lng } = e.latlng;
         onChange(lat, lng);
-        setCenter({lat, lng});
-        setPosition({lat, lng});
+        setCenter({ lat, lng });
+        setPosition({ lat, lng });
       },
     });
     return null;
