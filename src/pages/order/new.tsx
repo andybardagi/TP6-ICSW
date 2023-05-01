@@ -1,12 +1,12 @@
 import InputField from "@/components/forms/InputField";
 import Card from "@/components/layout/Card";
-import {City} from "@/models/City";
-import {Order} from "@/models/Order";
-import React, {useState} from "react";
+import { City } from "@/models/City";
+import { Order } from "@/models/Order";
+import React, { useState } from "react";
 import SelectField from "@/components/forms/SelectField";
-import {PaymentMethod, PaymentType} from "@/models/PaymentMethod";
-import {TextField} from "@/components/forms/TextField";
-import {GetServerSideProps} from "next";
+import { PaymentMethod, PaymentType } from "@/models/PaymentMethod";
+import { TextField } from "@/components/forms/TextField";
+import { GetServerSideProps } from "next";
 import Cards from 'react-credit-cards';
 import 'react-credit-cards/es/styles-compiled.css';
 import dynamic from "next/dynamic";
@@ -20,7 +20,7 @@ type NewOrderPageProps = {
   paymentMethods: PaymentMethod[];
 };
 
-export default function NewOrderPage({cities, paymentMethods}: NewOrderPageProps) {
+export default function NewOrderPage({ cities, paymentMethods }: NewOrderPageProps) {
   const [order, setOrder] = useState<Order>({
     orderAmount: 0,
     paymentAmount: 0,
@@ -45,7 +45,7 @@ export default function NewOrderPage({cities, paymentMethods}: NewOrderPageProps
       name: "",
       id: "",
       paymentType: PaymentType.Cash,
-      card: {cardNumber: "", cardHolderName: "", expirationMonth: "", cvc: "", expirationYear: ""}
+      card: { cardNumber: "", cardHolderName: "", expirationMonth: "", cvc: "", expirationYear: "" }
     },
   });
 
@@ -58,7 +58,7 @@ export default function NewOrderPage({cities, paymentMethods}: NewOrderPageProps
   ) => {
     setOrder((o) => ({
       ...o,
-      [config]: {...o[config], [attr]: value},
+      [config]: { ...o[config], [attr]: value },
     }));
   };
 
@@ -80,7 +80,7 @@ export default function NewOrderPage({cities, paymentMethods}: NewOrderPageProps
     const paymentMethod = paymentMethods.find((c) => c.id === value);
     setOrder((o) => ({
       ...o,
-      paymentMethod: paymentMethod ?? {name: '', id: '', paymentType: PaymentType.Cash}
+      paymentMethod: paymentMethod ?? { name: '', id: '', paymentType: PaymentType.Cash }
     }));
   }
 
@@ -142,7 +142,7 @@ export default function NewOrderPage({cities, paymentMethods}: NewOrderPageProps
       <h1 className="text-2xl font-bold mt-2 mb-0">Nuevo pedido</h1>
       <Card title="Productos">
         <InputField
-          onChange={(v) => setOrder((o) => ({...o, orderDetails: v}))}
+          onChange={(v) => setOrder((o) => ({ ...o, orderDetails: v }))}
           label="¿Qué debe buscar el cadete?"
           placeholder="Cuéntanos que debe buscar el cadete"
         />
@@ -250,13 +250,13 @@ export default function NewOrderPage({cities, paymentMethods}: NewOrderPageProps
         />
 
         <InputField
-          onChange={(value) => setOrder((o) => ({...o, orderAmount: Number(value)}))}
+          onChange={(value) => setOrder((o) => ({ ...o, orderAmount: Number(value) }))}
           label="Monto del pedido"
           placeholder="Indique el monto del pedido"
         />
 
         <InputField
-          onChange={(value) => setOrder((o) => ({...o, paymentAmount: Number(value)}))}
+          onChange={(value) => setOrder((o) => ({ ...o, paymentAmount: Number(value) }))}
           label="Monto a pagar"
           placeholder="Indique el monto con el que va a pagar"
         />
