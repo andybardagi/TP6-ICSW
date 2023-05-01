@@ -270,7 +270,7 @@ export default function NewOrderPage({cities, paymentMethods}: NewOrderPageProps
                 label="Número de tarjeta"
                 placeholder="Indique el número de la tarjeta"
                 name='number'
-                type='number'
+                maxLength={16}
               />
               <InputField
                 onChange={(value) => handleCreditCardInfoChange(value, 'cardHolderName')}
