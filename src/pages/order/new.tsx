@@ -10,6 +10,7 @@ import { GetServerSideProps } from "next";
 import Cards from 'react-credit-cards';
 import 'react-credit-cards/es/styles-compiled.css';
 import dynamic from "next/dynamic";
+import { calculateOrderAmount } from "@/helpers/calculateOrderAmount";
 
 const MapView = dynamic(() => import("../../components/map/MapView"), {
   ssr: false,
@@ -103,8 +104,6 @@ export default function NewOrderPage({ cities, paymentMethods }: NewOrderPagePro
       }
     })
   }
-  const getCityKey = (city: City) => city.id;
-  const getCityName = (city: City) => city.name;
 
   const handleMapClick = async (lat: number, lng: number) => {
     const response = await fetch(
@@ -142,7 +141,10 @@ export default function NewOrderPage({ cities, paymentMethods }: NewOrderPagePro
       <h1 className="text-2xl font-bold mt-2 mb-0">Nuevo pedido</h1>
       <Card title="Productos">
         <InputField
-          onChange={(v) => setOrder((o) => ({ ...o, orderDetails: v }))}
+          onChange={(v) => {
+            setOrder((o) => ({ ...o, orderDetails: v }))
+            setOrder((o) => ({ ...o, orderAmount: calculateOrderAmount() }));
+          }}
           label="¿Qué debe buscar el cadete?"
           placeholder="Cuéntanos que debe buscar el cadete"
         />
@@ -167,8 +169,8 @@ export default function NewOrderPage({ cities, paymentMethods }: NewOrderPagePro
                 handleCityChange(value, "deliveryLocation");
               }}
               data={cities}
-              keyExtractor={getCityKey}
-              render={getCityName}
+              keyExtractor={(city) => city.id}
+              render={(city) => city.name}
               label="Ciudad"
               placeholder="Seleccione la ciudad del comercio"
             />
@@ -239,6 +241,7 @@ export default function NewOrderPage({ cities, paymentMethods }: NewOrderPagePro
           placeholder="Seleccione la ciudad del comercio"
         />
       </Card>
+
       <Card title="Forma de pago">
         <SelectField
           onChange={(value) => handlePaymentMethodChange(value)}
@@ -249,18 +252,21 @@ export default function NewOrderPage({ cities, paymentMethods }: NewOrderPagePro
           placeholder="Seleccione la forma de pago"
         />
 
-        <InputField
-          onChange={(value) => setOrder((o) => ({ ...o, orderAmount: Number(value) }))}
+        <TextField
           label="Monto del pedido"
           placeholder="Indique el monto del pedido"
+          text={`$ ${order.orderAmount.toString()}`}
         />
 
-        <InputField
-          onChange={(value) => setOrder((o) => ({ ...o, paymentAmount: Number(value) }))}
-          label="Monto a pagar"
-          placeholder="Indique el monto con el que va a pagar"
-        />
+        {order.paymentMethod.paymentType === PaymentType.Cash && (
+          <InputField
+            onChange={(value) => setOrder((o) => ({ ...o, paymentAmount: Number(value) }))}
+            label="Monto a pagar"
+            placeholder="Indique el monto con el que va a pagar"
+          />
+        )}
       </Card>
+
       {(order.paymentMethod.paymentType === PaymentType.Card) && (
         <Card title={'Datos de la tarjeta'}>
           <div className="flex flex-row gap-1">
