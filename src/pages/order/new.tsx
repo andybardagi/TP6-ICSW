@@ -11,6 +11,7 @@ import Cards from 'react-credit-cards';
 import 'react-credit-cards/es/styles-compiled.css';
 import dynamic from 'next/dynamic';
 import { calculateOrderAmount } from '@/helpers/calculateOrderAmount';
+import checkoutOrder from '@/helpers/checkoutOrder';
 
 const MapView = dynamic(() => import('../../components/map/MapView'), {
   ssr: false,
@@ -325,7 +326,7 @@ export default function NewOrderPage({ cities, paymentMethods }: NewOrderPagePro
       )}
       <div className="flex flex-col gap-1 items-end">
         <label htmlFor="file" className="bg-cyan-600 px-4 py-2 text-white rounded-lg hover:bg-cyan-500 w-fit">
-          <button onClick={() => console.log(order)}>Crear pedido</button>
+          <button onClick={() => checkoutOrder(order)}>Crear pedido</button>
         </label>
       </div>
     </div>

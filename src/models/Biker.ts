@@ -1,7 +1,7 @@
 export class Biker {
-constructor(
+  constructor(
         public readonly id: number,
         public readonly name: string,
         public readonly lastName: string,
-    ) {}
+  ) {}
 }

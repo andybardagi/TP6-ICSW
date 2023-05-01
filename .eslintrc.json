@@ -2,6 +2,7 @@
   "extends": "next/core-web-vitals",
   "rules": {
     "object-curly-spacing": ["error", "always"],
-    "quotes": ["error", "single"]
+    "quotes": ["error", "single"],
+    "indent": ["error", 2]
   }
 }

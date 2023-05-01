@@ -1,5 +1,9 @@
 import { Order } from '@/models/Order';
 
-export default function checkoutOrder(order: Order) {
-    console.log('Order checked out', order);
+export default async function checkoutOrder(order: Order) {
+  const checkoutResult = await fetch(
+    `${process.env.NEXT_PUBLIC_URL}/api/orders`,
+    { method: 'POST', body: JSON.stringify(order) }
+  );
+  return checkoutResult.json();
 }
