@@ -40,6 +40,11 @@ export default function handler(req: NextApiRequest, res: NextApiResponse<any>) 
       }
     }
 
+    if (!order.orderAmount) {
+      return res.status(400).json({
+        message: 'No payment amount provided'
+      })
+    }
 
     return res.status(200).json({
       message: 'Order saved successfully'
