@@ -5,8 +5,7 @@ import cardValidator from 'card-validator';
 
 export default function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   if (req.method === 'POST') {
-    console.log('Order checked out', req.body);
-    const order: Order = req.body;
+    const order: Order = JSON.parse(req.body);
 
     if (!order) {
       return res.status(400).json({
