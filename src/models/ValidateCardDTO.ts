@@ -1,5 +1,5 @@
 export class ValidateCardDTO {
-    constructor(
+  constructor(
         public readonly valid: boolean,
-    ) {}
+  ) {}
 }

@@ -1,13 +1,13 @@
-import {PaymentMethod, PaymentType} from "@/models/PaymentMethod";
+import { PaymentMethod, PaymentType } from '@/models/PaymentMethod';
 
 export const paymentMethodArray: PaymentMethod[] = [
   {
-    id: "1",
+    id: '1',
     name: 'Efectivo',
     paymentType: PaymentType.Cash,
   },
   {
-    id: "2",
+    id: '2',
     name: 'Tarjeta',
     paymentType: PaymentType.Card,
     card: {
@@ -15,7 +15,7 @@ export const paymentMethodArray: PaymentMethod[] = [
       cardHolderName: '',
       expirationMonth: '',
       expirationYear: '',
-      cvv: ''
+      cvc: ''
     }
   }
 ];

@@ -1,4 +1,4 @@
-import {Card} from "@/models/Card";
+import { Card } from '@/models/Card';
 
 export const enum PaymentType {
   Card = 'card',

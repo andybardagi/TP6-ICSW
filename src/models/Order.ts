@@ -1,9 +1,9 @@
-import {OrderStatus} from "@/models/OrderStatus";
-import {Location} from "@/models/Location";
-import {PaymentMethod} from "@/models/PaymentMethod";
+import { OrderStatus } from '@/models/OrderStatus';
+import { Location } from '@/models/Location';
+import { PaymentMethod } from '@/models/PaymentMethod';
 
 export class Order {
-    constructor(
+  constructor(
         public readonly orderAmount: number,
         public readonly paymentAmount: number,
         public readonly orderDate: Date,
@@ -17,5 +17,5 @@ export class Order {
         public readonly bikerId?: number,
         public readonly status?: OrderStatus,
         public readonly id?: number
-    ) {}
+  ) {}
 }
