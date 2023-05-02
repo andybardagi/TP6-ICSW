@@ -19,7 +19,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse<any>) 
       })
     }
 
-    if (order.paymentMethod.name === PaymentType.Card) {
+    if (order.paymentMethod.paymentType === PaymentType.Card) {
       if (!order.paymentMethod.card) {
         return res.status(400).json({
           message: 'No card provided'
