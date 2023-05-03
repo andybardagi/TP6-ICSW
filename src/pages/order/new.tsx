@@ -1,28 +1,33 @@
-import InputField from '@/components/forms/InputField';
-import Card from '@/components/layout/Card';
-import { City } from '@/models/City';
-import { Order } from '@/models/Order';
-import React, { useState } from 'react';
-import SelectField from '@/components/forms/SelectField';
-import { PaymentMethod, PaymentType } from '@/models/PaymentMethod';
-import { TextField } from '@/components/forms/TextField';
-import { GetServerSideProps } from 'next';
-import Cards from 'react-credit-cards';
-import 'react-credit-cards/es/styles-compiled.css';
-import dynamic from 'next/dynamic';
-import { calculateOrderAmount } from '@/helpers/calculateOrderAmount';
-import checkoutOrder from '@/helpers/checkoutOrder';
+import InputField from '@/components/forms/InputField'
+import SelectField from '@/components/forms/SelectField'
+import { TextField } from '@/components/forms/TextField'
+import Card from '@/components/layout/Card'
+import { calculateOrderAmount } from '@/helpers/calculateOrderAmount'
+import { getErrorsMap } from '@/helpers/getErrorsMap'
+import { City } from '@/models/City'
+import { Order } from '@/models/Order'
+import { PaymentMethod, PaymentType } from '@/models/PaymentMethod'
+import { NewOrderValidationSchema } from '@/validation-schemas/NewOrderValidationSchema'
+import { GetServerSideProps } from 'next'
+import dynamic from 'next/dynamic'
+import { useState } from 'react'
+import Cards from 'react-credit-cards'
+import 'react-credit-cards/es/styles-compiled.css'
+import { ValidationError } from 'yup'
 
 const MapView = dynamic(() => import('../../components/map/MapView'), {
   ssr: false,
-});
+})
 
 type NewOrderPageProps = {
-  cities: City[];
-  paymentMethods: PaymentMethod[];
-};
+  cities: City[]
+  paymentMethods: PaymentMethod[]
+}
 
-export default function NewOrderPage({ cities, paymentMethods }: NewOrderPageProps) {
+export default function NewOrderPage({
+  cities,
+  paymentMethods,
+}: NewOrderPageProps) {
   const [order, setOrder] = useState<Order>({
     orderAmount: 0,
     paymentAmount: 0,
@@ -47,11 +52,19 @@ export default function NewOrderPage({ cities, paymentMethods }: NewOrderPagePro
       name: '',
       id: '',
       paymentType: PaymentType.Cash,
-      card: { cardNumber: '', cardHolderName: '', expirationMonth: '', cvc: '', expirationYear: '' }
+      card: {
+        cardNumber: '',
+        cardHolderName: '',
+        expirationMonth: '',
+        cvc: '',
+        expirationYear: '',
+      },
     },
-  });
+  })
 
-  const [focused, setFocused] = useState<'name' | 'number' | 'expiry' | 'cvc' | undefined>(undefined);
+  const [focused, setFocused] = useState<
+    'name' | 'number' | 'expiry' | 'cvc' | undefined
+  >(undefined)
 
   const handleLocationChange = (
     value: string,
@@ -61,34 +74,58 @@ export default function NewOrderPage({ cities, paymentMethods }: NewOrderPagePro
     setOrder((o) => ({
       ...o,
       [config]: { ...o[config], [attr]: value },
-    }));
-  };
+    }))
 
-  const handleCityChange = (value: string, config: 'deliveryLocation' | 'pickupLocation') => {
-    const city = cities.find((c) => c.id === value);
-    setLatitud(city?.latitud || 0);
-    setLongitud(city?.longitud || 0);
-    setSelectValueCity(city?.name || '' );
+    if (config != 'pickupLocation') return
+
+    if (attr === 'street') {
+      setInputValueStreet(value)
+    } else if (attr === 'number') {
+      setInputValueNumber(value)
+    }
+  }
+
+  const handleCityChange = (
+    value: string,
+    config: 'deliveryLocation' | 'pickupLocation'
+  ) => {
+    const city = cities.find((c) => c.id === value)
     setOrder((o) => ({
       ...o,
       [config]: {
         ...o[config],
         city: city ?? { name: '', id: '', latitud: 0, longitud: 0 },
       },
-    }));
-  };
+    }))
+    if (value != '') {
+      handleLocationChange('', 'pickupLocation', 'street')
+      handleLocationChange('', 'pickupLocation', 'number')
+      //setSelectValueCity(city?.name || '')
+    } 
+    setLatitud(city?.latitud || 0)
+    setLongitud(city?.longitud || 0)    
+  }
 
   const handlePaymentMethodChange = (value: string) => {
-    const paymentMethod = paymentMethods.find((c) => c.id === value);
+    const paymentMethod = paymentMethods.find((c) => c.id === value)
     setOrder((o) => ({
       ...o,
-      paymentMethod: paymentMethod ?? { name: '', id: '', paymentType: PaymentType.Cash }
-    }));
+      paymentMethod: paymentMethod ?? {
+        name: '',
+        id: '',
+        paymentType: PaymentType.Cash,
+      },
+    }))
   }
 
   const handleCreditCardInfoChange = (
     value: string | number,
-    atr: 'cardHolderName' | 'cardNumber' | 'expirationMonth' | 'expirationYear' | 'cvc'
+    atr:
+      | 'cardHolderName'
+      | 'cardNumber'
+      | 'expirationMonth'
+      | 'expirationYear'
+      | 'cvc'
   ) => {
     setOrder((prevOrder) => {
       if (!prevOrder.paymentMethod.card) return prevOrder
@@ -109,33 +146,54 @@ export default function NewOrderPage({ cities, paymentMethods }: NewOrderPagePro
   const handleMapClick = async (lat: number, lng: number) => {
     const response = await fetch(
       `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`
-    );
-    const data = await response.json();
-    const { address } = data;
-    setAddress({ latitud: lat, longitud: lng });
-    const city = cities.find((c) => c.name === address?.city);
-    handleCityChange(city?.name || '', 'pickupLocation');
-    handleCityChange(city?.name || '', 'deliveryLocation');
-    setSelectValueCity(city?.name || '');
-    handleLocationChange(address?.road || '', 'pickupLocation', 'street');
-    setInputValueStreet(address?.road || '');
-    handleLocationChange(address?.house_number || '', 'pickupLocation', 'number');
-    setInputValueNumber(address?.house_number || '');
-    setLatitud(lat);
-    setLongitud(lng);
-  };
+    )
+    const data = await response.json()
+    const { address } = data
+    setAddress({ latitud: lat, longitud: lng })
+    const city = cities.find((c) => c.name === address?.city)
+    if (city?.name === 'Córdoba') {
+      handleCityChange(city?.id || '', 'pickupLocation')
+      handleCityChange(city?.id || '', 'deliveryLocation')
+      handleLocationChange(address?.road || '', 'pickupLocation', 'street')
+      handleLocationChange(address?.house_number || '', 'pickupLocation', 'number')
+    } else {
+      handleLocationChange('', 'pickupLocation', 'street')
+      handleLocationChange('', 'pickupLocation', 'number')
+    }   
+    setLatitud(lat)
+    setLongitud(lng)
+  }
 
   const [address, setAddress] = useState<Address>({
     latitud: -31.416668,
     longitud: -64.183334,
-  });
+  })
 
-  const [inputValueStreet, setInputValueStreet] = useState('');
-  const [inputValueNumber, setInputValueNumber] = useState('');
-  const [selectValueNumber, setSelectValueCity] = useState('');
+  const [inputValueStreet, setInputValueStreet] = useState('')
+  const [inputValueNumber, setInputValueNumber] = useState('')
+  const [selectValueCity, setSelectValueCity] = useState('')
 
-  const [latitud, setLatitud] = useState(-31.416668);
-  const [longitud, setLongitud] = useState(-64.183334);
+  const [latitud, setLatitud] = useState(-31.416668)
+  const [longitud, setLongitud] = useState(-64.183334)
+
+  const handleCheckout = async () => {
+    try {
+      const validation = NewOrderValidationSchema.validate({}, {
+        abortEarly: false,
+      })
+        .then((v) => v)
+        .catch((err: ValidationError) => {
+          console.log(getErrorsMap(err))
+        })
+
+      //const response = await checkoutOrder(order)
+      //console.log(response)
+      //alert('Pedido creado con éxito')
+    } catch (err) {
+      console.log(err)
+      alert('Error al crear pedido')
+    }
+  }
 
   return (
     <div className="flex flex-col gap-4 p-5">
@@ -144,7 +202,7 @@ export default function NewOrderPage({ cities, paymentMethods }: NewOrderPagePro
         <InputField
           onChange={(v) => {
             setOrder((o) => ({ ...o, orderDetails: v }))
-            setOrder((o) => ({ ...o, orderAmount: calculateOrderAmount() }));
+            setOrder((o) => ({ ...o, orderAmount: calculateOrderAmount() }))
           }}
           label="¿Qué debe buscar el cadete?"
           placeholder="Cuéntanos que debe buscar el cadete"
@@ -157,8 +215,54 @@ export default function NewOrderPage({ cities, paymentMethods }: NewOrderPagePro
           >
             Foto
           </label>
-          <input id="file" type="file" className="max-w-lg hidden"/>
+          <input id="file" type="file" className="max-w-lg hidden" />
         </div>
+      </Card>
+
+      <Card title="Momento de entrega">
+        <form>
+          <div className="flex flex-col gap-3 w-full">
+            <div className="flex flex-row gap-4">
+              <input
+                type="radio"
+                name="deliver-time"
+                id="now"
+                onChange={() => {
+                  setOrder((o) => ({ ...o, asap: true }))
+                }}
+              />
+              <label htmlFor="now">Lo antes posible</label>
+            </div>
+            <div className="flex flex-row gap-4">
+              <input
+                type="radio"
+                name="deliver-time"
+                id="later"
+                onChange={() => {
+                  setOrder((o) => ({ ...o, asap: false }))
+                }}
+              />
+              <label htmlFor="later">Programar entrega</label>
+            </div>
+            {order.asap ? null : (
+              <div className="flex flex-col gap-2">
+                <label htmlFor="later">Hora de entrega:</label>
+                <input
+                  type="datetime-local"
+                  className="border border-cyan-600 w-60 px-2 py-1 rounded-md"
+                  onChange={(e) => {
+                    setOrder((o) => ({
+                      ...o,
+                      deliveryDate: !e.target.value
+                        ? undefined
+                        : new Date(e.target.value),
+                    }))
+                  }}
+                />
+              </div>
+            )}
+          </div>
+        </form>
       </Card>
 
       <Card title="Direccion de comercio">
@@ -166,14 +270,15 @@ export default function NewOrderPage({ cities, paymentMethods }: NewOrderPagePro
           <div className="flex flex-col gap-3 w-full">
             <SelectField
               onChange={(value) => {
-                handleCityChange(value, 'pickupLocation');
-                handleCityChange(value, 'deliveryLocation');
+                handleCityChange(value, 'pickupLocation')
+                handleCityChange(value, 'deliveryLocation')
               }}
               data={cities}
               keyExtractor={(city) => city.id}
               render={(city) => city.name}
               label="Ciudad"
               placeholder="Seleccione la ciudad del comercio"
+              value={order.pickupLocation.city.name}
             />
 
             <InputField
@@ -203,9 +308,7 @@ export default function NewOrderPage({ cities, paymentMethods }: NewOrderPagePro
 
           <div className="w-full">
             <MapView
-              onChange={(lat, lng) =>
-                handleMapClick(lat, lng)
-              }
+              onChange={(lat, lng) => handleMapClick(lat, lng)}
               latitud={latitud}
               longitud={longitud}
               address={address}
@@ -261,51 +364,72 @@ export default function NewOrderPage({ cities, paymentMethods }: NewOrderPagePro
 
         {order.paymentMethod.paymentType === PaymentType.Cash && (
           <InputField
-            onChange={(value) => setOrder((o) => ({ ...o, paymentAmount: Number(value) }))}
+            onChange={(value) =>
+              setOrder((o) => ({ ...o, paymentAmount: Number(value) }))
+            }
             label="Monto a pagar"
             placeholder="Indique el monto con el que va a pagar"
           />
         )}
       </Card>
 
-      {(order.paymentMethod.paymentType === PaymentType.Card) && (
+      {order.paymentMethod.paymentType === PaymentType.Card && (
         <Card title={'Datos de la tarjeta'}>
           <div className="flex flex-row gap-1">
-            <form onFocus={(e) => setFocused(e.target.name as 'name' | 'number' | 'expiry' | 'cvc' | undefined)}>
+            <form
+              onFocus={(e) =>
+                setFocused(
+                  e.target.name as
+                    | 'name'
+                    | 'number'
+                    | 'expiry'
+                    | 'cvc'
+                    | undefined
+                )
+              }
+            >
               <InputField
-                onChange={(value) => handleCreditCardInfoChange(value, 'cardNumber')}
+                onChange={(value) =>
+                  handleCreditCardInfoChange(value, 'cardNumber')
+                }
                 label="Número de tarjeta"
                 placeholder="Indique el número de la tarjeta"
-                name='number'
+                name="number"
                 maxLength={16}
               />
               <InputField
-                onChange={(value) => handleCreditCardInfoChange(value, 'cardHolderName')}
+                onChange={(value) =>
+                  handleCreditCardInfoChange(value, 'cardHolderName')
+                }
                 label="Nombre del titular"
                 placeholder="Indique el nombre del titular de la tarjeta"
-                name='name'
+                name="name"
               />
               <div className="flex flex-row gap-1">
                 <InputField
-                  onChange={(value) => handleCreditCardInfoChange(value, 'expirationMonth')}
-                  label='Mes de vencimiento'
-                  placeholder='MM'
-                  name='expiry'
+                  onChange={(value) =>
+                    handleCreditCardInfoChange(value, 'expirationMonth')
+                  }
+                  label="Mes de vencimiento"
+                  placeholder="MM"
+                  name="expiry"
                   maxLength={2}
                 />
                 <InputField
-                  onChange={(value) => handleCreditCardInfoChange(value, 'expirationYear')}
+                  onChange={(value) =>
+                    handleCreditCardInfoChange(value, 'expirationYear')
+                  }
                   label="Año de vencimiento"
                   placeholder="AA"
-                  name='expiry'
+                  name="expiry"
                   maxLength={2}
                 />
               </div>
               <InputField
                 onChange={(value) => handleCreditCardInfoChange(value, 'cvc')}
-                label='CVC'
-                placeholder='Indique el CVV de la tarjeta'
-                name='cvc'
+                label="CVC"
+                placeholder="Indique el CVV de la tarjeta"
+                name="cvc"
                 maxLength={3}
               />
             </form>
@@ -313,7 +437,11 @@ export default function NewOrderPage({ cities, paymentMethods }: NewOrderPagePro
               <div className="m-auto">
                 <Cards
                   cvc={order.paymentMethod.card.cvc}
-                  expiry={order.paymentMethod.card.expirationMonth + '/' + order.paymentMethod.card.expirationYear}
+                  expiry={
+                    order.paymentMethod.card.expirationMonth +
+                    '/' +
+                    order.paymentMethod.card.expirationYear
+                  }
                   focused={focused}
                   name={order.paymentMethod.card.cardHolderName}
                   number={order.paymentMethod.card.cardNumber}
@@ -325,25 +453,32 @@ export default function NewOrderPage({ cities, paymentMethods }: NewOrderPagePro
         </Card>
       )}
       <div className="flex flex-col gap-1 items-end">
-        <label htmlFor="file" className="bg-cyan-600 px-4 py-2 text-white rounded-lg hover:bg-cyan-500 w-fit">
-          <button onClick={() => checkoutOrder(order)}>Crear pedido</button>
+        <label
+          htmlFor="file"
+          className="bg-cyan-600 px-4 py-2 text-white rounded-lg hover:bg-cyan-500 w-fit"
+        >
+          <button onClick={handleCheckout} role="none">
+            Crear pedido
+          </button>
         </label>
       </div>
     </div>
-  );
+  )
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const citiesResData = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/cities`);
-  const cities = await citiesResData.json();
+  const citiesResData = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/cities`)
+  const cities = await citiesResData.json()
 
-  const paymentMethodsResData = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/payment/methods`);
-  const paymentMethods = await paymentMethodsResData.json();
+  const paymentMethodsResData = await fetch(
+    `${process.env.NEXT_PUBLIC_URL}/api/payment/methods`
+  )
+  const paymentMethods = await paymentMethodsResData.json()
 
   return {
     props: {
       cities,
       paymentMethods,
     },
-  };
-};
+  }
+}
