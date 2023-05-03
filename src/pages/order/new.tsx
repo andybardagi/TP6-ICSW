@@ -90,9 +90,6 @@ export default function NewOrderPage({
     config: 'deliveryLocation' | 'pickupLocation'
   ) => {
     const city = cities.find((c) => c.id === value)
-    setLatitud(city?.latitud || 0)
-    setLongitud(city?.longitud || 0)
-    setSelectValueCity(city?.name || '')
     setOrder((o) => ({
       ...o,
       [config]: {
@@ -100,6 +97,13 @@ export default function NewOrderPage({
         city: city ?? { name: '', id: '', latitud: 0, longitud: 0 },
       },
     }))
+    if (value != '') {
+      handleLocationChange('', 'pickupLocation', 'street')
+      handleLocationChange('', 'pickupLocation', 'number')
+      //setSelectValueCity(city?.name || '')
+    } 
+    setLatitud(city?.latitud || 0)
+    setLongitud(city?.longitud || 0)    
   }
 
   const handlePaymentMethodChange = (value: string) => {
@@ -147,17 +151,15 @@ export default function NewOrderPage({
     const { address } = data
     setAddress({ latitud: lat, longitud: lng })
     const city = cities.find((c) => c.name === address?.city)
-    handleCityChange(city?.name || '', 'pickupLocation')
-    handleCityChange(city?.name || '', 'deliveryLocation')
-    setSelectValueCity(city?.name || '')
-    handleLocationChange(address?.road || '', 'pickupLocation', 'street')
-    setInputValueStreet(address?.road || '')
-    handleLocationChange(
-      address?.house_number || '',
-      'pickupLocation',
-      'number'
-    )
-    setInputValueNumber(address?.house_number || '')
+    if (city?.name === 'Córdoba') {
+      handleCityChange(city?.id || '', 'pickupLocation')
+      handleCityChange(city?.id || '', 'deliveryLocation')
+      handleLocationChange(address?.road || '', 'pickupLocation', 'street')
+      handleLocationChange(address?.house_number || '', 'pickupLocation', 'number')
+    } else {
+      handleLocationChange('', 'pickupLocation', 'street')
+      handleLocationChange('', 'pickupLocation', 'number')
+    }   
     setLatitud(lat)
     setLongitud(lng)
   }
@@ -169,7 +171,7 @@ export default function NewOrderPage({
 
   const [inputValueStreet, setInputValueStreet] = useState('')
   const [inputValueNumber, setInputValueNumber] = useState('')
-  const [selectValueNumber, setSelectValueCity] = useState('')
+  const [selectValueCity, setSelectValueCity] = useState('')
 
   const [latitud, setLatitud] = useState(-31.416668)
   const [longitud, setLongitud] = useState(-64.183334)
@@ -276,6 +278,7 @@ export default function NewOrderPage({
               render={(city) => city.name}
               label="Ciudad"
               placeholder="Seleccione la ciudad del comercio"
+              value={order.pickupLocation.city.name}
             />
 
             <InputField
