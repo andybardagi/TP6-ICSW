@@ -14,6 +14,7 @@ import { useState } from 'react'
 import Cards from 'react-credit-cards'
 import 'react-credit-cards/es/styles-compiled.css'
 import { ValidationError } from 'yup'
+import checkoutOrder from '@/helpers/checkoutOrder';
 
 const MapView = dynamic(() => import('../../components/map/MapView'), {
   ssr: false,
@@ -101,9 +102,9 @@ export default function NewOrderPage({
       handleLocationChange('', 'pickupLocation', 'street')
       handleLocationChange('', 'pickupLocation', 'number')
       //setSelectValueCity(city?.name || '')
-    } 
+    }
     setLatitud(city?.latitud || 0)
-    setLongitud(city?.longitud || 0)    
+    setLongitud(city?.longitud || 0)
   }
 
   const handlePaymentMethodChange = (value: string) => {
@@ -159,7 +160,7 @@ export default function NewOrderPage({
     } else {
       handleLocationChange('', 'pickupLocation', 'street')
       handleLocationChange('', 'pickupLocation', 'number')
-    }   
+    }
     setLatitud(lat)
     setLongitud(lng)
   }
@@ -178,20 +179,19 @@ export default function NewOrderPage({
 
   const handleCheckout = async () => {
     try {
-      const validation = NewOrderValidationSchema.validate({}, {
+      await NewOrderValidationSchema.validate(order, {
         abortEarly: false,
-      })
-        .then((v) => v)
-        .catch((err: ValidationError) => {
-          console.log(getErrorsMap(err))
-        })
+      });
 
-      //const response = await checkoutOrder(order)
-      //console.log(response)
-      //alert('Pedido creado con éxito')
+      const result = await checkoutOrder(order)
+      alert(result)
     } catch (err) {
-      console.log(err)
-      alert('Error al crear pedido')
+      if (err instanceof ValidationError) {
+        console.log(getErrorsMap(err))
+      } else {
+        console.log(err);
+      }
+      alert(err);
     }
   }
 
@@ -209,10 +209,7 @@ export default function NewOrderPage({
         />
 
         <div className="flex flex-col gap-1">
-          <label
-            htmlFor="file"
-            className="bg-cyan-600 px-4 py-2 text-white rounded-lg hover:bg-cyan-500 w-fit"
-          >
+          <label htmlFor="file" className="bg-cyan-600 px-4 py-2 text-white rounded-lg hover:bg-cyan-500 w-fit">
             Foto
           </label>
           <input id="file" type="file" className="max-w-lg hidden" />
@@ -454,7 +451,6 @@ export default function NewOrderPage({
       )}
       <div className="flex flex-col gap-1 items-end">
         <label
-          htmlFor="file"
           className="bg-cyan-600 px-4 py-2 text-white rounded-lg hover:bg-cyan-500 w-fit"
         >
           <button onClick={handleCheckout} role="none">
