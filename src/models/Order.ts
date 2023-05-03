@@ -9,11 +9,11 @@ export class Order {
         public readonly orderDate: Date,
         public readonly customerId: number,
         public readonly asap: boolean,
-        public readonly deliveryDate: Date,
         public readonly deliveryLocation: Location,
         public readonly pickupLocation: Location,
         public readonly orderDetails: string,
         public readonly paymentMethod: PaymentMethod,
+        public readonly deliveryDate?: Date,
         public readonly bikerId?: number,
         public readonly status?: OrderStatus,
         public readonly id?: number

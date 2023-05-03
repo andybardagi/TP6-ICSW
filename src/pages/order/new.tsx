@@ -1,17 +1,19 @@
 import InputField from '@/components/forms/InputField'
+import SelectField from '@/components/forms/SelectField'
+import { TextField } from '@/components/forms/TextField'
 import Card from '@/components/layout/Card'
+import { calculateOrderAmount } from '@/helpers/calculateOrderAmount'
+import { getErrorsMap } from '@/helpers/getErrorsMap'
 import { City } from '@/models/City'
 import { Order } from '@/models/Order'
-import React, { useState } from 'react'
-import SelectField from '@/components/forms/SelectField'
 import { PaymentMethod, PaymentType } from '@/models/PaymentMethod'
-import { TextField } from '@/components/forms/TextField'
+import { NewOrderValidationSchema } from '@/validation-schemas/NewOrderValidationSchema'
 import { GetServerSideProps } from 'next'
+import dynamic from 'next/dynamic'
+import { useState } from 'react'
 import Cards from 'react-credit-cards'
 import 'react-credit-cards/es/styles-compiled.css'
-import dynamic from 'next/dynamic'
-import { calculateOrderAmount } from '@/helpers/calculateOrderAmount'
-import checkoutOrder from '@/helpers/checkoutOrder'
+import { ValidationError } from 'yup'
 
 const MapView = dynamic(() => import('../../components/map/MapView'), {
   ssr: false,
@@ -174,9 +176,17 @@ export default function NewOrderPage({
 
   const handleCheckout = async () => {
     try {
-      const response = await checkoutOrder(order)
-      console.log(response)
-      alert('Pedido creado con éxito')
+      const validation = NewOrderValidationSchema.validate({}, {
+        abortEarly: false,
+      })
+        .then((v) => v)
+        .catch((err: ValidationError) => {
+          console.log(getErrorsMap(err))
+        })
+
+      //const response = await checkoutOrder(order)
+      //console.log(response)
+      //alert('Pedido creado con éxito')
     } catch (err) {
       console.log(err)
       alert('Error al crear pedido')
@@ -211,13 +221,44 @@ export default function NewOrderPage({
         <form>
           <div className="flex flex-col gap-3 w-full">
             <div className="flex flex-row gap-4">
-              <input type="radio" name="deliver-time" id="now" />
+              <input
+                type="radio"
+                name="deliver-time"
+                id="now"
+                onChange={() => {
+                  setOrder((o) => ({ ...o, asap: true }))
+                }}
+              />
               <label htmlFor="now">Lo antes posible</label>
             </div>
             <div className="flex flex-row gap-4">
-              <input type="radio" name="deliver-time" id="later" />
+              <input
+                type="radio"
+                name="deliver-time"
+                id="later"
+                onChange={() => {
+                  setOrder((o) => ({ ...o, asap: false }))
+                }}
+              />
               <label htmlFor="later">Programar entrega</label>
             </div>
+            {order.asap ? null : (
+              <div className="flex flex-col gap-2">
+                <label htmlFor="later">Hora de entrega:</label>
+                <input
+                  type="datetime-local"
+                  className="border border-cyan-600 w-60 px-2 py-1 rounded-md"
+                  onChange={(e) => {
+                    setOrder((o) => ({
+                      ...o,
+                      deliveryDate: !e.target.value
+                        ? undefined
+                        : new Date(e.target.value),
+                    }))
+                  }}
+                />
+              </div>
+            )}
           </div>
         </form>
       </Card>
@@ -413,7 +454,9 @@ export default function NewOrderPage({
           htmlFor="file"
           className="bg-cyan-600 px-4 py-2 text-white rounded-lg hover:bg-cyan-500 w-fit"
         >
-          <button onClick={handleCheckout}>Crear pedido</button>
+          <button onClick={handleCheckout} role="none">
+            Crear pedido
+          </button>
         </label>
       </div>
     </div>
