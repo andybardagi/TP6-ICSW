@@ -62,6 +62,7 @@ export default function NewOrderPage({
       },
     },
   })
+  const [errors, setErrors] = useState<Record<string, string>>({})
 
   const [focused, setFocused] = useState<
     'name' | 'number' | 'expiry' | 'cvc' | undefined
@@ -156,7 +157,11 @@ export default function NewOrderPage({
       handleCityChange(city?.id || '', 'pickupLocation')
       handleCityChange(city?.id || '', 'deliveryLocation')
       handleLocationChange(address?.road || '', 'pickupLocation', 'street')
-      handleLocationChange(address?.house_number || '', 'pickupLocation', 'number')
+      handleLocationChange(
+        address?.house_number || '',
+        'pickupLocation',
+        'number'
+      )
     } else {
       handleLocationChange('', 'pickupLocation', 'street')
       handleLocationChange('', 'pickupLocation', 'number')
@@ -179,9 +184,17 @@ export default function NewOrderPage({
 
   const handleCheckout = async () => {
     try {
-      await NewOrderValidationSchema.validate(order, {
-        abortEarly: false,
-      });
+      const validation = NewOrderValidationSchema.validate(
+        order,
+        {
+          abortEarly: false,
+        }
+      )
+        .then((v) => v)
+        .catch((err: ValidationError) => {
+          console.log(getErrorsMap(err))
+          setErrors(getErrorsMap(err))
+        })
 
       const result = await checkoutOrder(order)
       alert(result)
@@ -206,6 +219,8 @@ export default function NewOrderPage({
           }}
           label="¿Qué debe buscar el cadete?"
           placeholder="Cuéntanos que debe buscar el cadete"
+          hasError={errors.orderDetails !== undefined}
+          errorMessage={errors.orderDetails || ''}
         />
 
         <div className="flex flex-col gap-1">
@@ -276,6 +291,8 @@ export default function NewOrderPage({
               label="Ciudad"
               placeholder="Seleccione la ciudad del comercio"
               value={order.pickupLocation.city.name}
+              hasError={errors['pickupLocation.city.id'] !== undefined}
+              errorMessage={errors['pickupLocation.city.id'] || ''}
             />
 
             <InputField
@@ -285,6 +302,8 @@ export default function NewOrderPage({
               label="Calle del comercio"
               placeholder="Indique la calle del local de su pedido"
               value={inputValueStreet}
+              hasError={errors['pickupLocation.street'] !== undefined}
+              errorMessage={errors['pickupLocation.street'] || ''}
             />
             <InputField
               onChange={(value) =>
@@ -292,7 +311,10 @@ export default function NewOrderPage({
               }
               label="Número del comercio"
               placeholder="Indique el número de la calle de su comercio"
+              type='number'
               value={inputValueNumber}
+              hasError={errors['pickupLocation.number'] !== undefined}
+              errorMessage={errors['pickupLocation.number'] || ''}
             />
             <InputField
               onChange={(value) =>
@@ -300,6 +322,8 @@ export default function NewOrderPage({
               }
               label="Referencia"
               placeholder="Ayuda al repartidor a encontrar el comercio"
+              hasError={errors['pickupLocation.reference'] !== undefined}
+              errorMessage={errors['pickupLocation.reference'] || ''}
             />
           </div>
 
@@ -321,6 +345,8 @@ export default function NewOrderPage({
           }
           label="Calle del entrega"
           placeholder="Indique la calle donde debe ser entregado el pedido"
+          hasError={errors['deliveryLocation.street'] !== undefined}
+          errorMessage={errors['deliveryLocation.street'] || ''}
         />
         <InputField
           onChange={(value) =>
@@ -328,6 +354,10 @@ export default function NewOrderPage({
           }
           label="Número de la calle"
           placeholder="Indique el número de la calle donde debe ser entregado el pedido"
+          type='number'
+          hasError={errors['deliveryLocation.number'] !== undefined}
+          errorMessage={errors['deliveryLocation.number'] || ''}
+
         />
         <InputField
           onChange={(value) =>
@@ -335,11 +365,15 @@ export default function NewOrderPage({
           }
           label="Referencia"
           placeholder="Ayuda al repartidor a encontrar tu domicilio"
+          hasError={errors['deliveryLocation.reference'] !== undefined}
+          errorMessage={errors['deliveryLocation.reference'] || ''}
         />
         <TextField
           text={order.deliveryLocation.city.name}
           label="Ciudad"
           placeholder="Seleccione la ciudad del comercio"
+          hasError={errors['deliveryLocation.city.id'] !== undefined}
+          errorMessage={errors['deliveryLocation.city.id'] || ''}
         />
       </Card>
 
@@ -351,12 +385,16 @@ export default function NewOrderPage({
           render={(pm: PaymentMethod) => pm.name}
           label="Forma de pago"
           placeholder="Seleccione la forma de pago"
+          hasError={errors['paymentMethod.id'] !== undefined}
+          errorMessage={errors['paymentMethod.id'] || ''}
         />
 
-        <TextField
+        <InputField
           label="Monto del pedido"
           placeholder="Indique el monto del pedido"
-          text={`$ ${order.orderAmount.toString()}`}
+          value={`$ ${order.orderAmount.toString()}`}
+          onChange={() => { }}
+
         />
 
         {order.paymentMethod.paymentType === PaymentType.Cash && (
@@ -366,6 +404,8 @@ export default function NewOrderPage({
             }
             label="Monto a pagar"
             placeholder="Indique el monto con el que va a pagar"
+            hasError={errors['paymentAmount'] !== undefined}
+            errorMessage={errors['paymentAmount'] || ''}
           />
         )}
       </Card>
@@ -393,6 +433,8 @@ export default function NewOrderPage({
                 placeholder="Indique el número de la tarjeta"
                 name="number"
                 maxLength={16}
+                hasError={errors['cardNumber'] !== undefined}
+                errorMessage={errors['cardNumber'] || ''}
               />
               <InputField
                 onChange={(value) =>
@@ -401,6 +443,8 @@ export default function NewOrderPage({
                 label="Nombre del titular"
                 placeholder="Indique el nombre del titular de la tarjeta"
                 name="name"
+                hasError={errors['cardHolderName'] !== undefined}
+                errorMessage={errors['cardHolderName'] || ''}
               />
               <div className="flex flex-row gap-1">
                 <InputField
@@ -411,6 +455,8 @@ export default function NewOrderPage({
                   placeholder="MM"
                   name="expiry"
                   maxLength={2}
+                  hasError={errors['expirationMonth'] !== undefined}
+                  errorMessage={errors['expirationMonth'] || ''}
                 />
                 <InputField
                   onChange={(value) =>
@@ -420,6 +466,8 @@ export default function NewOrderPage({
                   placeholder="AA"
                   name="expiry"
                   maxLength={2}
+                  hasError={errors['expirationYear'] !== undefined}
+                  errorMessage={errors['expirationYear'] || ''}
                 />
               </div>
               <InputField
@@ -428,6 +476,8 @@ export default function NewOrderPage({
                 placeholder="Indique el CVV de la tarjeta"
                 name="cvc"
                 maxLength={3}
+                hasError={errors['cvc'] !== undefined}
+                errorMessage={errors['cvc'] || ''}
               />
             </form>
             {order.paymentMethod.card && (
