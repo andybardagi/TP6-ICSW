@@ -1,4 +1,3 @@
-import { Order } from '@/models/Order'
 import { object, string, number, date, boolean } from 'yup'
 export const NewOrderValidationSchema = object().shape({
   orderAmount: number()

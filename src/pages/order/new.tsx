@@ -14,6 +14,7 @@ import { useState } from 'react'
 import Cards from 'react-credit-cards'
 import 'react-credit-cards/es/styles-compiled.css'
 import { ValidationError } from 'yup'
+import checkoutOrder from '@/helpers/checkoutOrder';
 
 const MapView = dynamic(() => import('../../components/map/MapView'), {
   ssr: false,
@@ -195,12 +196,15 @@ export default function NewOrderPage({
           setErrors(getErrorsMap(err))
         })
 
-      //const response = await checkoutOrder(order)
-      //console.log(response)
-      //alert('Pedido creado con éxito')
+      const result = await checkoutOrder(order)
+      alert(result)
     } catch (err) {
-      console.log(err)
-      alert('Error al crear pedido')
+      if (err instanceof ValidationError) {
+        console.log(getErrorsMap(err))
+      } else {
+        console.log(err);
+      }
+      alert(err);
     }
   }
 
@@ -220,10 +224,7 @@ export default function NewOrderPage({
         />
 
         <div className="flex flex-col gap-1">
-          <label
-            htmlFor="file"
-            className="bg-cyan-600 px-4 py-2 text-white rounded-lg hover:bg-cyan-500 w-fit"
-          >
+          <label htmlFor="file" className="bg-cyan-600 px-4 py-2 text-white rounded-lg hover:bg-cyan-500 w-fit">
             Foto
           </label>
           <input id="file" type="file" className="max-w-lg hidden" />
@@ -500,7 +501,6 @@ export default function NewOrderPage({
       )}
       <div className="flex flex-col gap-1 items-end">
         <label
-          htmlFor="file"
           className="bg-cyan-600 px-4 py-2 text-white rounded-lg hover:bg-cyan-500 w-fit"
         >
           <button onClick={handleCheckout} role="none">
