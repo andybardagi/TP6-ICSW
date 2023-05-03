@@ -1,4 +1,3 @@
-import { Order } from '@/models/Order'
 import { object, string, number, date, boolean } from 'yup'
 export const NewOrderValidationSchema = object().shape({
   orderAmount: number()
@@ -111,9 +110,6 @@ export const NewOrderValidationSchema = object().shape({
       .required('El tipo de pago del método de pago es requerido')
       .typeError('El tipo de pago del método de pago debe ser un string'),
     card: object().shape({
-      id: string()
-        .required('El id de la tarjeta del método de pago es requerido')
-        .typeError('El id de la tarjeta del método de pago debe ser un string'),
       cardHolderName: string()
         .required('El nombre de la tarjeta del método de pago es requerido')
         .typeError(
