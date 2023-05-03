@@ -7,6 +7,8 @@ type SelectProps<T> = {
   keyExtractor: (item: T) => string;
   render: (item: T) => string;
   value?: string;
+  hasError?: boolean;
+  errorMessage?: string;
 };
 
 export default function SelectField<T>({
@@ -17,12 +19,14 @@ export default function SelectField<T>({
   keyExtractor,
   render,
   value,
+  hasError,
+  errorMessage,
 }: SelectProps<T>) {
   return (
     <div className="flex flex-col gap-1">
       <label>{label}</label>
       <select
-        className="border border-cyan-600 max-w-lg px-2 py-1 rounded-md"
+        className={`border max-w-lg px-2 py-1 rounded-md ${hasError ? 'border-red-500' : 'border-cyan-600 '}`}
         onChange={(event) => onChange(event.target.value)}
         value={value}
       >
@@ -37,6 +41,7 @@ export default function SelectField<T>({
           </option>
         ))}
       </select>
+      {hasError ? <span className="text-red-500 text-sm">{errorMessage}</span> : null}
     </div>
   );
 }

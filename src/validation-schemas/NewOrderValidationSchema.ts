@@ -14,7 +14,7 @@ export const NewOrderValidationSchema = object().shape({
     .typeError('La fecha del pedido debe ser una fecha'),
   customerId: number()
     .min(0)
-    .required('El id del cliente es requerido')
+    .required('El cliente es requerido')
     .typeError('El id del cliente debe ser un número'),
   asap: boolean()
     .required('El pedido asap es requerido')
@@ -31,10 +31,11 @@ export const NewOrderValidationSchema = object().shape({
       .typeError('La calle de la ubicación de entrega debe ser un string'),
     number: number()
       .required('El número de la ubicación de entrega es requerido')
+      .min(1, 'El número de la ubicación de entrega debe ser mayor a 0')
       .typeError('El número de la ubicación de entrega debe ser un número'),
     city: object().shape({
       id: string()
-        .required('El id de la ciudad de la ubicación de entrega es requerido')
+        .required('La ciudad de la ubicación de entrega es requerido')
         .typeError(
           'El id de la ciudad de la ubicación de entrega debe ser un string'
         ),
@@ -60,6 +61,9 @@ export const NewOrderValidationSchema = object().shape({
           'La longitud de la ciudad de la ubicación de entrega debe ser un número'
         ),
     }),
+    reference: string()
+      .required('La referencia de la ubicación de entrega es requerida')
+      .typeError('La referencia de la ubicación de entrega debe ser un string'),
   }),
   pickupLocation: object().shape({
     street: string()
@@ -67,10 +71,11 @@ export const NewOrderValidationSchema = object().shape({
       .typeError('La calle de la ubicación de recogida debe ser un string'),
     number: number()
       .required('El número de la ubicación de recogida es requerido')
+      .min(1, 'El número de la ubicación de recogida debe ser mayor a 0')
       .typeError('El número de la ubicación de recogida debe ser un número'),
     city: object().shape({
       id: string()
-        .required('El id de la ciudad de la ubicación de recogida es requerido')
+        .required('La ciudad de la ubicación de recogida es requerido')
         .typeError(
           'El id de la ciudad de la ubicación de recogida debe ser un string'
         ),
@@ -96,13 +101,16 @@ export const NewOrderValidationSchema = object().shape({
           'La longitud de la ciudad de la ubicación de recogida debe ser un número'
         ),
     }),
+    reference: string()
+      .required('La referencia de la ubicación de recogida es requerida')
+      .typeError( 'La referencia de la ubicación de recogida debe ser un string'),
   }),
   orderDetails: string()
     .required('Los detalles del pedido son requeridos')
     .typeError('Los detalles del pedido deben ser un string'),
   paymentMethod: object().shape({
     id: string()
-      .required('El id del método de pago es requerido')
+      .required('El método de pago es requerido')
       .typeError('El id del método de pago debe ser un string'),
     name: string()
       .required('El nombre del método de pago es requerido')
@@ -112,7 +120,7 @@ export const NewOrderValidationSchema = object().shape({
       .typeError('El tipo de pago del método de pago debe ser un string'),
     card: object().shape({
       id: string()
-        .required('El id de la tarjeta del método de pago es requerido')
+        .required('La tarjeta del método de pago es requerido')
         .typeError('El id de la tarjeta del método de pago debe ser un string'),
       cardHolderName: string()
         .required('El nombre de la tarjeta del método de pago es requerido')
