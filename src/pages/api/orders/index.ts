@@ -26,13 +26,25 @@ export default function handler(req: NextApiRequest, res: NextApiResponse<any>) 
         })
       }
 
-      if (!cardValidator.number(order.paymentMethod.card.cardNumber).isValid) {
+      const cardValidation = cardValidator.number(order.paymentMethod.card.cardNumber);
+      if (!cardValidation.isValid) {
         return res.status(400).json({
           message: 'Invalid card number'
         })
       }
+
+      if (cardValidation.card && cardValidation.card.type !== 'visa') {
+        return res.status(400).json({
+          message: 'Only Visa cards are accepted'
+        })
+      }
     }
 
+    if (!order.orderAmount) {
+      return res.status(400).json({
+        message: 'No payment amount provided'
+      })
+    }
 
     return res.status(200).json({
       message: 'Order saved successfully'
