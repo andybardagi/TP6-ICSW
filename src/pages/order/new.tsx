@@ -184,15 +184,20 @@ export default function NewOrderPage({
 
   const handleCheckout = async () => {
     try {
+      setErrors({});
       await NewOrderValidationSchema.validate(
         order,
         {
           abortEarly: false,
         }
-      ).then(async (v) => {
-        console.log(v);
+      ).then(async () => {
         const result = await checkoutOrder(order)
-        alert(result)
+        console.log(result)
+        if (result.result === 'OK') {
+          // Resetear el formulario.
+        } else {
+          alert(result.message)
+        }
       }).catch((err: unknown) => {
         if (err instanceof ValidationError) {
           console.log(getErrorsMap(err));

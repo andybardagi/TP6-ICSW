@@ -118,35 +118,15 @@ export const NewOrderValidationSchema = object().shape({
       .required('El tipo de pago del método de pago es requerido')
       .typeError('El tipo de pago del método de pago debe ser un string'),
     card: object().shape({
-      cardHolderName: string()
-        .required('El nombre de la tarjeta del método de pago es requerido')
-        .typeError(
-          'El nombre de la tarjeta del método de pago debe ser un string'
-        ),
-      cardNumber: string()
-        .required('El número de la tarjeta del método de pago es requerido')
-        .typeError(
-          'El número de la tarjeta del método de pago debe ser un string'
-        ),
-      expirationMonth: string()
-        .required(
-          'El mes de expiración de la tarjeta del método de pago es requerido'
-        )
-        .typeError(
-          'El mes de expiración de la tarjeta del método de pago debe ser un string'
-        ),
-      expirationYear: string()
-        .required(
-          'El año de expiración de la tarjeta del método de pago es requerido'
-        )
-        .typeError(
-          'El año de expiración de la tarjeta del método de pago debe ser un string'
-        ),
-      cvc: string()
-        .required('El cvc de la tarjeta del método de pago es requerido')
-        .typeError(
-          'El cvc de la tarjeta del método de pago debe ser un string'
-        ),
+      paymentType: string(),
+      cardHolderName: string(),
+      cardNumber: string(),
+      expirationMonth: string(),
+      expirationYear: string(),
+      cvc: string(),
+    }).when('paymentType', (paymentType: any, schema) => {
+      if (paymentType === 'card') return schema.required('La tarjeta de crédito es requerida')
+      return schema
     }),
   }),
   bikerId: number(),
