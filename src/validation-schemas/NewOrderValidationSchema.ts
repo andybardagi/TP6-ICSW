@@ -118,9 +118,6 @@ export const NewOrderValidationSchema = object().shape({
       .required('El tipo de pago del método de pago es requerido')
       .typeError('El tipo de pago del método de pago debe ser un string'),
     card: object().shape({
-      id: string()
-        .required('La tarjeta del método de pago es requerido')
-        .typeError('El id de la tarjeta del método de pago debe ser un string'),
       cardHolderName: string()
         .required('El nombre de la tarjeta del método de pago es requerido')
         .typeError(

@@ -1,15 +1,15 @@
-import CategoryBadge from "@/components/home/CategoryBadge";
-import { Inter } from "next/font/google";
-import Link from "next/link";
-import { useState } from "react";
-import { BsSearch } from "react-icons/bs";
+import CategoryBadge from '@/components/home/CategoryBadge';
+import { Inter } from 'next/font/google';
+import Link from 'next/link';
+import { useState } from 'react';
+import { BsSearch } from 'react-icons/bs';
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ['latin'] });
 
 export default function Home() {
   const [isActive, setIsActive] = useState(false);
 
-  const categories = ["Pizza", "Hamburguesa", "Lomitos", "Empanadas", "Sushi"];
+  const categories = ['Pizza', 'Hamburguesa', 'Lomitos', 'Empanadas', 'Sushi'];
 
   return (
     <main>
@@ -17,8 +17,8 @@ export default function Home() {
         <div
           className={`w-full flex flex-row items-center gap-2 rounded-full py-2 px-4 ${
             isActive
-              ? "border-2 border-cyan-600 border-inside"
-              : "border-2 border-slate-100"
+              ? 'border-2 border-cyan-600 border-inside'
+              : 'border-2 border-slate-100'
           }`}
         >
           <BsSearch />
@@ -38,7 +38,7 @@ export default function Home() {
           <h6 className="text-center text-slate-600 text-sm">
             No encontrás lo que buscás?
           </h6>
-          <Link href={"/order/new"}>
+          <Link href={'/order/new'}>
             <button className="bg-sky-500 text-white font-semibold w-full h-fit px-auto py-2 text-large rounded-full">
               Pedí lo que sea a donde quieras!
             </button>

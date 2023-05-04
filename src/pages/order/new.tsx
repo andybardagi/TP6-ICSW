@@ -184,26 +184,25 @@ export default function NewOrderPage({
 
   const handleCheckout = async () => {
     try {
-      const validation = NewOrderValidationSchema.validate(
+      await NewOrderValidationSchema.validate(
         order,
         {
           abortEarly: false,
         }
-      )
-        .then((v) => v)
-        .catch((err: ValidationError) => {
-          console.log(getErrorsMap(err))
+      ).then(async (v) => {
+        console.log(v);
+        const result = await checkoutOrder(order)
+        alert(result)
+      }).catch((err: unknown) => {
+        if (err instanceof ValidationError) {
+          console.log(getErrorsMap(err));
           setErrors(getErrorsMap(err))
-        })
-
-      const result = await checkoutOrder(order)
-      alert(result)
+        } else {
+          alert(err)
+          console.log(err);
+        }
+      })
     } catch (err) {
-      if (err instanceof ValidationError) {
-        console.log(getErrorsMap(err))
-      } else {
-        console.log(err);
-      }
       alert(err);
     }
   }
@@ -361,7 +360,7 @@ export default function NewOrderPage({
         />
         <InputField
           onChange={(value) =>
-            handleLocationChange(value, 'pickupLocation', 'reference')
+            handleLocationChange(value, 'deliveryLocation', 'reference')
           }
           label="Referencia"
           placeholder="Ayuda al repartidor a encontrar tu domicilio"

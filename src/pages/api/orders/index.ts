@@ -9,45 +9,68 @@ export default function handler(req: NextApiRequest, res: NextApiResponse<any>) 
 
     if (!order) {
       return res.status(400).json({
-        message: 'No order provided'
+        message: 'Debes enviar un pedido',
+        result: 'ERROR'
       })
     }
 
     if (!order.paymentMethod) {
       return res.status(400).json({
-        message: 'No payment method provided'
+        message: 'No proporcionaste un método de pago',
+        result: 'ERROR'
       })
     }
 
     if (order.paymentMethod.paymentType === PaymentType.Card) {
       if (!order.paymentMethod.card) {
         return res.status(400).json({
-          message: 'No card provided'
+          message: 'No proporcionaste una tarjeta de crédito',
+          result: 'ERROR'
         })
       }
 
       const cardValidation = cardValidator.number(order.paymentMethod.card.cardNumber);
       if (!cardValidation.isValid) {
         return res.status(400).json({
-          message: 'Invalid card number'
+          message: 'La tarjeta de crédito no es válida',
+          result: 'ERROR'
         })
       }
 
       if (cardValidation.card && cardValidation.card.type !== 'visa') {
         return res.status(400).json({
-          message: 'Only Visa cards are accepted'
+          message: 'Solo se aceptan tarjetas Visa',
+          result: 'ERROR'
+        })
+      }
+
+      const expirationMonthValidation = cardValidator.expirationMonth(order.paymentMethod.card.expirationMonth);
+      if (!expirationMonthValidation.isValid) {
+        return res.status(400).json({
+          message: 'El mes de expiración de la tarjeta de crédito no es válido',
+          result: 'ERROR'
+        })
+      }
+
+      const expirationYearValidation = cardValidator.expirationYear(order.paymentMethod.card.expirationYear);
+      if (!expirationYearValidation.isValid) {
+        return res.status(400).json({
+          message: 'El año de expiración de la tarjeta de crédito no es válido',
+          result: 'ERROR'
         })
       }
     }
 
     if (!order.orderAmount) {
       return res.status(400).json({
-        message: 'No payment amount provided'
+        message: 'No proporcionaste el monto del pedido',
+        result: 'ERROR'
       })
     }
 
     return res.status(200).json({
-      message: 'Order saved successfully'
+      message: 'Pedido creado correctamente',
+      result: 'OK'
     })
   }
 }
