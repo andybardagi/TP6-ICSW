@@ -228,7 +228,7 @@ export default function NewOrderPage({
         />
 
         <div className="flex flex-col gap-1">
-          <label htmlFor="file" className="bg-cyan-600 px-4 py-2 text-white rounded-lg hover:bg-cyan-500 w-fit">
+          <label htmlFor="file" className="bg-myYellow px-4 py-2 text-mainBlue rounded-lg hover:bg-myOrange w-fit">
             Foto
           </label>
           <input id="file" type="file" className="max-w-lg hidden" />
@@ -238,7 +238,7 @@ export default function NewOrderPage({
       <Card title="Momento de entrega">
         <form>
           <div className="flex flex-col gap-3 w-full">
-            <div className="flex flex-row gap-4">
+            <div className="flex flex-row gap-4 items-center">
               <input
                 type="radio"
                 name="deliver-time"
@@ -249,7 +249,7 @@ export default function NewOrderPage({
               />
               <label htmlFor="now">Lo antes posible</label>
             </div>
-            <div className="flex flex-row gap-4">
+            <div className="flex flex-row gap-4 items-center">
               <input
                 type="radio"
                 name="deliver-time"
@@ -505,7 +505,7 @@ export default function NewOrderPage({
       )}
       <div className="flex flex-col gap-1 items-end">
         <label
-          className="bg-cyan-600 px-4 py-2 text-white rounded-lg hover:bg-cyan-500 w-fit"
+          className="bg-myYellow px-4 py-2 text-mainBlue rounded-lg hover:bg-myOrange w-fit"
         >
           <button onClick={handleCheckout} role="none">
             Crear pedido

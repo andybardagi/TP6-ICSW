@@ -21,7 +21,7 @@ const MapView = ({ onChange, latitud, longitud, address }: MapViewProps) => {
   const icon = L.divIcon({
     className: 'custom-icon',
     html: ReactDOMServer.renderToString(
-      <BsFillPinFill className="text-3xl text-red-800" />
+      <BsFillPinFill className="text-3xl text-myRed" />
     ),
   })
 
