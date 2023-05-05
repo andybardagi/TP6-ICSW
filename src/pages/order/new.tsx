@@ -191,6 +191,10 @@ export default function NewOrderPage({
       const result = await checkoutOrder(order);
       if (result.result === 'OK') {
         setOrder(emptyOrder);
+        setInputValueStreet('');
+        setInputValueNumber('');
+        setInputValueReference('');
+        setErrors({});
         alert(result.message);
       } else {
         alert(result.message);
@@ -213,6 +217,7 @@ export default function NewOrderPage({
           placeholder="Cuéntanos que debe buscar el cadete"
           hasError={errors.orderDetails !== undefined}
           errorMessage={errors.orderDetails || ''}
+          value={order.orderDetails}
         />
 
         <div className="flex flex-col gap-1">
