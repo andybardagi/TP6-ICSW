@@ -9,10 +9,10 @@ export default function handler(req: NextApiRequest, res: NextApiResponse<Paymen
       return res.status(400).json({
         result: 'Error',
         error: 'Payment rejected'
-      })
+      });
     }
     return res.status(200).json({
       result: 'Ok'
-    })
+    });
   }
 }
