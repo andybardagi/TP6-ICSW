@@ -2,9 +2,9 @@ import { useEffect } from 'react';
 import { useMap } from 'react-leaflet';
 
 type RecenterProps = {
-  lat: number
-  lng: number
-}
+  lat: number;
+  lng: number;
+};
 
 export const Recenter = ({ lat, lng }: RecenterProps) => {
   const map = useMap();

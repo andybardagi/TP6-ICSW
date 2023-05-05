@@ -3,7 +3,10 @@ import { Order } from '@/models/Order';
 import { PaymentType } from '@/models/PaymentMethod';
 import cardValidator from 'card-validator';
 
-export default function handler(req: NextApiRequest, res: NextApiResponse<any>) {
+export default function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<any>
+) {
   if (req.method === 'POST') {
     const order: Order = JSON.parse(req.body);
 
@@ -29,7 +32,9 @@ export default function handler(req: NextApiRequest, res: NextApiResponse<any>) 
         });
       }
 
-      const cardValidation = cardValidator.number(order.paymentMethod.card.cardNumber);
+      const cardValidation = cardValidator.number(
+        order.paymentMethod.card.cardNumber
+      );
       if (!cardValidation.isValid) {
         return res.status(400).json({
           message: 'La tarjeta de crédito no es válida',
@@ -44,7 +49,9 @@ export default function handler(req: NextApiRequest, res: NextApiResponse<any>) 
         });
       }
 
-      const expirationMonthValidation = cardValidator.expirationMonth(order.paymentMethod.card.expirationMonth);
+      const expirationMonthValidation = cardValidator.expirationMonth(
+        order.paymentMethod.card.expirationMonth
+      );
       if (!expirationMonthValidation.isValid) {
         return res.status(400).json({
           message: 'El mes de expiración de la tarjeta de crédito no es válido',
@@ -52,7 +59,9 @@ export default function handler(req: NextApiRequest, res: NextApiResponse<any>) 
         });
       }
 
-      const expirationYearValidation = cardValidator.expirationYear(order.paymentMethod.card.expirationYear);
+      const expirationYearValidation = cardValidator.expirationYear(
+        order.paymentMethod.card.expirationYear
+      );
       if (!expirationYearValidation.isValid) {
         return res.status(400).json({
           message: 'El año de expiración de la tarjeta de crédito no es válido',

@@ -20,8 +20,7 @@ export default function InputField({
   maxLength,
   type = 'text',
   hasError,
-  errorMessage,
-
+  errorMessage
 }: InputProps) {
   return (
     <div className="flex flex-col gap-1">
@@ -30,15 +29,16 @@ export default function InputField({
         name={name}
         type={type}
         maxLength={maxLength}
-        className={`border max-w-lg px-2 py-1 rounded-md ${hasError ? 'border-myRed' : 'border-myYellow '}`}
+        className={`border max-w-lg px-2 py-1 rounded-md ${
+          hasError ? 'border-myRed' : 'border-myYellow '
+        }`}
         placeholder={placeholder}
         onChange={(event) => onChange(event.target.value)}
         value={value}
-        
       />
-      {hasError ? <span className="text-myRed text-sm">{errorMessage}</span> : null}
+      {hasError ? (
+        <span className="text-myRed text-sm">{errorMessage}</span>
+      ) : null}
     </div>
   );
 }
-
-

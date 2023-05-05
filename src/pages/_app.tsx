@@ -6,14 +6,13 @@ import { Inter } from 'next/font/google';
 
 const inter = Inter({
   weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
-  subsets: ['latin'],
+  subsets: ['latin']
 });
-
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
-    <div style={inter.style} >
-      <Navbar/>
+    <div style={inter.style}>
+      <Navbar />
       <Layout>
         <Component {...pageProps} />
       </Layout>

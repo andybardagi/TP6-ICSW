@@ -2,7 +2,7 @@ import { Card } from '@/models/Card';
 
 export const enum PaymentType {
   Card = 'card',
-  Cash = 'cash',
+  Cash = 'cash'
 }
 
 export class PaymentMethod {
