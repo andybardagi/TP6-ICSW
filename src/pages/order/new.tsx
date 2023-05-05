@@ -410,8 +410,8 @@ export default function NewOrderPage({
         />
 
         <InputField
-          label="Monto del pedido"
-          placeholder="Indique el monto del pedido"
+          label="Monto del envio "
+          placeholder="Indique el monto del envio"
           value={`$ ${order.orderAmount.toString()}`}
           onChange={() => {}}
         />
