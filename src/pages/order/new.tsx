@@ -77,6 +77,8 @@ export default function NewOrderPage({
       setInputValueStreet(value);
     } else if (attr === 'number') {
       setInputValueNumber(value);
+    } else if (attr === 'reference') {
+      setInputValueReference(value);
     }
   };
 
@@ -95,7 +97,10 @@ export default function NewOrderPage({
     if (value != '') {
       handleLocationChange('', 'pickupLocation', 'street');
       handleLocationChange('', 'pickupLocation', 'number');
-      //setSelectValueCity(city?.name || '')
+      handleLocationChange('', 'pickupLocation', 'reference');
+      //handleLocationChange('', 'deliveryLocation', 'street');
+      //handleLocationChange('', 'deliveryLocation', 'number');
+      //handleLocationChange('', 'deliveryLocation', 'reference');
     }
     setLatitud(city?.latitud || 0);
     setLongitud(city?.longitud || 0);
@@ -158,6 +163,7 @@ export default function NewOrderPage({
     } else {
       handleLocationChange('', 'pickupLocation', 'street');
       handleLocationChange('', 'pickupLocation', 'number');
+      //handleLocationChange('', 'pickupLocation', 'reference');
     }
     setLatitud(lat);
     setLongitud(lng);
@@ -170,6 +176,7 @@ export default function NewOrderPage({
 
   const [inputValueStreet, setInputValueStreet] = useState('');
   const [inputValueNumber, setInputValueNumber] = useState('');
+  const [inputValueReference, setInputValueReference] = useState('');
 
   const [latitud, setLatitud] = useState(-31.416668);
   const [longitud, setLongitud] = useState(-64.183334);
@@ -341,6 +348,7 @@ export default function NewOrderPage({
               }
               label="Referencia"
               placeholder="Ayuda al repartidor a encontrar el comercio"
+              value={inputValueReference}
               hasError={errors['pickupLocation.reference'] !== undefined}
               errorMessage={errors['pickupLocation.reference'] || ''}
             />
