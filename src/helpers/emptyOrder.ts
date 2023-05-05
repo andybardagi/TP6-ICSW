@@ -11,25 +11,25 @@ export const emptyOrder = {
     street: '',
     number: 0,
     city: { name: '', id: '', latitud: 0, longitud: 0 },
-    reference: '',
+    reference: ''
   },
   pickupLocation: {
     street: '',
     number: 0,
     city: { name: '', id: '', latitud: 0, longitud: 0 },
-    reference: '',
+    reference: ''
   },
   orderDetails: '',
   paymentMethod: {
-    name: '',
     id: '',
-    paymentType: PaymentType.Cash,
+    name: '',
+    paymentType: '',
     card: {
       cardNumber: '',
       cardHolderName: '',
       expirationMonth: '',
       cvc: '',
-      expirationYear: '',
-    },
-  },
+      expirationYear: ''
+    }
+  }
 };

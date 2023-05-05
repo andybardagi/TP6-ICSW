@@ -17,6 +17,8 @@ import { ValidationError } from 'yup';
 import checkoutOrder from '@/helpers/checkoutOrder';
 import { emptyOrder } from '@/helpers/emptyOrder';
 import { BsCheck, BsXCircleFill } from 'react-icons/bs';
+import { VisaCreditCardValidationSchema } from '@/validation-schemas/VisaCreditCardValidationSchema';
+import { validateNewOrder } from '@/helpers/validateNewOrder';
 
 const MapView = dynamic(() => import('../../components/map/MapView'), {
   ssr: false
@@ -42,7 +44,7 @@ export default function NewOrderPage({
   const [previewUrl, setPreviewUrl] = useState<string | undefined>();
 
   const handleFileInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if(!e.target.files) return;
+    if (!e.target.files) return;
     const file = e.target.files[0];
     // Verificar si el archivo es .png
     if (file && file.type === 'image/png') {
@@ -58,7 +60,6 @@ export default function NewOrderPage({
       setPreviewUrl(undefined);
     }
   };
-
 
   const handleLocationChange = (
     value: string,
@@ -76,6 +77,8 @@ export default function NewOrderPage({
       setInputValueStreet(value);
     } else if (attr === 'number') {
       setInputValueNumber(value);
+    } else if (attr === 'reference') {
+      setInputValueReference(value);
     }
   };
 
@@ -94,7 +97,10 @@ export default function NewOrderPage({
     if (value != '') {
       handleLocationChange('', 'pickupLocation', 'street');
       handleLocationChange('', 'pickupLocation', 'number');
-      //setSelectValueCity(city?.name || '')
+      handleLocationChange('', 'pickupLocation', 'reference');
+      //handleLocationChange('', 'deliveryLocation', 'street');
+      //handleLocationChange('', 'deliveryLocation', 'number');
+      //handleLocationChange('', 'deliveryLocation', 'reference');
     }
     setLatitud(city?.latitud || 0);
     setLongitud(city?.longitud || 0);
@@ -157,6 +163,7 @@ export default function NewOrderPage({
     } else {
       handleLocationChange('', 'pickupLocation', 'street');
       handleLocationChange('', 'pickupLocation', 'number');
+      //handleLocationChange('', 'pickupLocation', 'reference');
     }
     setLatitud(lat);
     setLongitud(lng);
@@ -169,107 +176,120 @@ export default function NewOrderPage({
 
   const [inputValueStreet, setInputValueStreet] = useState('');
   const [inputValueNumber, setInputValueNumber] = useState('');
+  const [inputValueReference, setInputValueReference] = useState('');
 
   const [latitud, setLatitud] = useState(-31.416668);
   const [longitud, setLongitud] = useState(-64.183334);
 
   const handleCheckout = async () => {
     try {
-      setErrors({});
-      await NewOrderValidationSchema.validate(order, {
-        abortEarly: false,
-      })
-        .then(async () => {
-          const result = await checkoutOrder(order);
-          if (result.result === 'OK') {
-            setOrder(emptyOrder);
-            alert(result.message);
-          } else {
-            alert(result.message);
-          }
-        })
-        .catch((err: unknown) => {
-          if (err instanceof ValidationError) {
-            console.log(getErrorsMap(err));
-            setErrors(getErrorsMap(err));
-          } else {
-            alert(err);
-            console.log(err);
-          }
-        });
+      const validationResult = await validateNewOrder(order);
+      if (!validationResult.valid) {
+        setErrors(validationResult.errors);
+        return;
+      }
+      const result = await checkoutOrder(order);
+      if (result.result === 'OK') {
+        setOrder(emptyOrder);
+        setInputValueStreet('');
+        setInputValueNumber('');
+        setInputValueReference('');
+        setErrors({});
+        alert(result.message);
+      } else {
+        alert(result.message);
+      }
     } catch (err) {
       alert(err);
     }
   };
 
   return (
-    <div className='flex flex-col gap-4 p-5'>
-      <h1 className='text-2xl font-bold mt-2 mb-0'>Nuevo pedido</h1>
-      <Card title='Productos'>
+    <div className="flex flex-col gap-4 p-5">
+      <h1 className="text-2xl font-bold mt-2 mb-0">Nuevo pedido</h1>
+      <Card title="Productos">
         <InputField
           onChange={(v) => {
             setOrder((o) => ({ ...o, orderDetails: v }));
             setOrder((o) => ({ ...o, orderAmount: calculateOrderAmount() }));
           }}
-          label='¿Qué debe buscar el cadete?'
-          placeholder='Cuéntanos que debe buscar el cadete'
+          label="¿Qué debe buscar el cadete?"
+          placeholder="Cuéntanos que debe buscar el cadete"
           hasError={errors.orderDetails !== undefined}
           errorMessage={errors.orderDetails || ''}
+          value={order.orderDetails}
         />
 
-        <div className='flex flex-col gap-1'>
+        <div className="flex flex-col gap-1">
           <label
-            htmlFor='file'
-            className='bg-myYellow px-4 py-2 text-mainBlue rounded-lg hover:bg-myOrange w-fit'
+            htmlFor="file"
+            className="bg-myYellow px-4 py-2 text-mainBlue rounded-lg hover:bg-myOrange w-fit"
           >
             Foto
           </label>
-          <input id='file' type='file' className='max-w-lg hidden' onChange={handleFileInputChange} />
+          <input
+            id="file"
+            type="file"
+            className="max-w-lg hidden"
+            onChange={handleFileInputChange}
+          />
           <div>
-            {previewUrl != null ? 
-              <div className='relative w-fit'>
-                <BsXCircleFill className='text-myRed text-2xl cursor-pointer absolute top-0 right-0' title="Eliminar foto" onClick={() => {
-                  setSelectedFile(undefined);
-                  setPreviewUrl(undefined);
-                }}/>
-                <img src={previewUrl} alt="Imagen previa" className='border border-myYellow max-h-64' /> 
+            {previewUrl != null ? (
+              <div className="relative w-fit">
+                <BsXCircleFill
+                  className="text-myRed text-2xl cursor-pointer absolute top-0 right-0"
+                  title="Eliminar foto"
+                  onClick={() => {
+                    setSelectedFile(undefined);
+                    setPreviewUrl(undefined);
+                  }}
+                />
+                <img
+                  src={previewUrl}
+                  alt="Imagen previa"
+                  className="border border-myYellow max-h-64"
+                />
               </div>
-              : null}
+            ) : null}
           </div>
         </div>
       </Card>
 
-      <Card title='Momento de entrega'>
+      <Card title="Momento de entrega">
         <form>
-          <div className='flex flex-col gap-3 w-full'>
-            <div className='flex flex-row gap-4 items-center'>
+          <div className="flex flex-col gap-3 w-full">
+            <div className="flex flex-row gap-4 items-center">
               <input
-                type='radio'
-                name='deliver-time'
-                id='now'
+                type="radio"
+                name="deliver-time"
+                id="now"
                 onChange={() => {
                   setOrder((o) => ({ ...o, asap: true }));
                 }}
               />
-              <label htmlFor='now'>Lo antes posible</label>
+              <label htmlFor="now">Lo antes posible</label>
             </div>
-            <div className='flex flex-row gap-4 items-center'>
+            <div className="flex flex-row gap-4 items-center">
               <input
-                type='radio'
-                name='deliver-time'
-                id='later'
+                type="radio"
+                name="deliver-time"
+                id="later"
                 onChange={() => {
                   setOrder((o) => ({ ...o, asap: false }));
                 }}
               />
-              <label htmlFor='later'>Programar entrega</label>
+              <label htmlFor="later">Programar entrega</label>
             </div>
             {order.asap ? null : (
-              <div className='flex flex-col gap-2'>
-                <label htmlFor='later'>Hora de entrega:</label>
+              <div className="flex flex-col gap-2">
+                <label htmlFor="later">Hora de entrega:</label>
                 <input
-                  type='datetime-local'
-                  className={`border w-60 px-2 py-1 rounded-md ${errors['deliveryDate'] !== undefined ? 'border-myRed' : 'border-myYellow'}`}
+                  type="datetime-local"
+                  className={`border w-60 px-2 py-1 rounded-md ${
+                    errors['deliveryDate'] !== undefined
+                      ? 'border-myRed'
+                      : 'border-myYellow'
+                  }`}
                   onChange={(e) => {
                     setOrder((o) => ({
                       ...o,
@@ -280,17 +300,17 @@ export default function NewOrderPage({
                   }}
                 />
                 {errors['deliveryDate'] !== undefined ? (
-                  <p className='text-myRed'>{errors['deliveryDate']}</p>
-                ):null}
+                  <p className="text-myRed">{errors['deliveryDate']}</p>
+                ) : null}
               </div>
             )}
           </div>
         </form>
       </Card>
 
-      <Card title='Direccion de comercio'>
-        <div className='lg:flex-row lg:gap-2 flex flex-col gap-3'>
-          <div className='flex flex-col gap-3 w-full'>
+      <Card title="Direccion de comercio">
+        <div className="lg:flex-row lg:gap-2 flex flex-col gap-3">
+          <div className="flex flex-col gap-3 w-full">
             <SelectField
               onChange={(value) => {
                 handleCityChange(value, 'pickupLocation');
@@ -299,9 +319,9 @@ export default function NewOrderPage({
               data={cities}
               keyExtractor={(city) => city.id}
               render={(city) => city.name}
-              label='Ciudad'
-              placeholder='Seleccione la ciudad del comercio'
-              value={order.pickupLocation.city.name}
+              label="Ciudad"
+              placeholder="Seleccione la ciudad del comercio"
+              value={order.pickupLocation.city.id}
               hasError={errors['pickupLocation.city.id'] !== undefined}
               errorMessage={errors['pickupLocation.city.id'] || ''}
             />
@@ -310,8 +330,8 @@ export default function NewOrderPage({
               onChange={(value) =>
                 handleLocationChange(value, 'pickupLocation', 'street')
               }
-              label='Calle del comercio'
-              placeholder='Indique la calle del local de su pedido'
+              label="Calle del comercio"
+              placeholder="Indique la calle del local de su pedido"
               value={inputValueStreet}
               hasError={errors['pickupLocation.street'] !== undefined}
               errorMessage={errors['pickupLocation.street'] || ''}
@@ -320,9 +340,9 @@ export default function NewOrderPage({
               onChange={(value) =>
                 handleLocationChange(value, 'pickupLocation', 'number')
               }
-              label='Número del comercio'
-              placeholder='Indique el número de la calle de su comercio'
-              type='number'
+              label="Número del comercio"
+              placeholder="Indique el número de la calle de su comercio"
+              type="number"
               value={inputValueNumber}
               hasError={errors['pickupLocation.number'] !== undefined}
               errorMessage={errors['pickupLocation.number'] || ''}
@@ -331,14 +351,16 @@ export default function NewOrderPage({
               onChange={(value) =>
                 handleLocationChange(value, 'pickupLocation', 'reference')
               }
-              label='Referencia'
-              placeholder='Ayuda al repartidor a encontrar el comercio'
+              label="Referencia"
+              isOptional
+              placeholder="Ayuda al repartidor a encontrar el comercio"
+              value={inputValueReference}
               hasError={errors['pickupLocation.reference'] !== undefined}
               errorMessage={errors['pickupLocation.reference'] || ''}
             />
           </div>
 
-          <div className='w-full'>
+          <div className="w-full">
             <MapView
               onChange={(lat, lng) => handleMapClick(lat, lng)}
               latitud={latitud}
@@ -349,11 +371,11 @@ export default function NewOrderPage({
         </div>
       </Card>
 
-      <Card title='Direccion de entrega'>
+      <Card title="Direccion de entrega">
         <TextField
           text={order.deliveryLocation.city.name}
-          label='Ciudad'
-          placeholder='Seleccione la ciudad del comercio'
+          label="Ciudad"
+          placeholder="Seleccione la ciudad del comercio"
           hasError={errors['deliveryLocation.city.id'] !== undefined}
           errorMessage={errors['deliveryLocation.city.id'] || ''}
         />
@@ -362,8 +384,8 @@ export default function NewOrderPage({
             handleLocationChange(value, 'deliveryLocation', 'street')
           }
           value={order.deliveryLocation.street}
-          label='Calle del entrega'
-          placeholder='Indique la calle donde debe ser entregado el pedido'
+          label="Calle del entrega"
+          placeholder="Indique la calle donde debe ser entregado el pedido"
           hasError={errors['deliveryLocation.street'] !== undefined}
           errorMessage={errors['deliveryLocation.street'] || ''}
         />
@@ -372,9 +394,9 @@ export default function NewOrderPage({
             handleLocationChange(value, 'deliveryLocation', 'number')
           }
           value={order.deliveryLocation.number.toString()}
-          label='Número de la calle'
-          placeholder='Indique el número de la calle donde debe ser entregado el pedido'
-          type='number'
+          label="Número de la calle"
+          placeholder="Indique el número de la calle donde debe ser entregado el pedido"
+          type="number"
           hasError={errors['deliveryLocation.number'] !== undefined}
           errorMessage={errors['deliveryLocation.number'] || ''}
         />
@@ -382,28 +404,30 @@ export default function NewOrderPage({
           onChange={(value) =>
             handleLocationChange(value, 'deliveryLocation', 'reference')
           }
-          label='Referencia'
-          placeholder='Ayuda al repartidor a encontrar tu domicilio'
+          label="Referencia"
+          isOptional
+          placeholder="Ayuda al repartidor a encontrar tu domicilio"
           hasError={errors['deliveryLocation.reference'] !== undefined}
           errorMessage={errors['deliveryLocation.reference'] || ''}
         />
       </Card>
 
-      <Card title='Forma de pago'>
+      <Card title="Forma de pago">
         <SelectField
           onChange={(value) => handlePaymentMethodChange(value)}
           data={paymentMethods}
           keyExtractor={(pm: PaymentMethod) => pm.id}
           render={(pm: PaymentMethod) => pm.name}
-          label='Forma de pago'
-          placeholder='Seleccione la forma de pago'
+          label="Forma de pago"
+          placeholder="Seleccione la forma de pago"
           hasError={errors['paymentMethod.id'] !== undefined}
           errorMessage={errors['paymentMethod.id'] || ''}
+          value={order.paymentMethod.id}
         />
 
         <InputField
-          label='Monto del pedido'
-          placeholder='Indique el monto del pedido'
+          label="Monto del envio "
+          placeholder="Indique el monto del envio"
           value={`$ ${order.orderAmount.toString()}`}
           onChange={() => {}}
         />
@@ -413,8 +437,8 @@ export default function NewOrderPage({
             onChange={(value) =>
               setOrder((o) => ({ ...o, paymentAmount: Number(value) }))
             }
-            label='Monto a pagar'
-            placeholder='Indique el monto con el que va a pagar'
+            label="Monto a pagar"
+            placeholder="Indique el monto con el que va a pagar"
             hasError={errors['paymentAmount'] !== undefined}
             errorMessage={errors['paymentAmount'] || ''}
           />
@@ -423,9 +447,9 @@ export default function NewOrderPage({
 
       {order.paymentMethod.paymentType === PaymentType.Card && (
         <Card title={'Datos de la tarjeta'}>
-          <div className='flex flex-col lg:flex-row gap-4 lg:gap-1'>
+          <div className="flex flex-col lg:flex-row gap-4 lg:gap-1">
             <form
-              className='flex flex-col gap-3'
+              className="flex flex-col gap-3"
               onFocus={(e) =>
                 setFocused(
                   e.target.name as
@@ -441,35 +465,41 @@ export default function NewOrderPage({
                 onChange={(value) =>
                   handleCreditCardInfoChange(value, 'cardNumber')
                 }
-                label='Número de tarjeta'
-                placeholder='Indique el número de la tarjeta'
-                name='number'
+                label="Número de tarjeta"
+                placeholder="Indique el número de la tarjeta"
+                name="number"
                 maxLength={16}
-                hasError={errors['cardNumber'] !== undefined}
-                errorMessage={errors['cardNumber'] || ''}
+                hasError={errors['paymentMethod.card.cardNumber'] !== undefined}
+                errorMessage={errors['paymentMethod.card.cardNumber'] || ''}
               />
               <InputField
                 onChange={(value) =>
                   handleCreditCardInfoChange(value, 'cardHolderName')
                 }
-                label='Nombre del titular'
-                placeholder='Indique el nombre del titular de la tarjeta'
-                name='name'
-                hasError={errors['cardHolderName'] !== undefined}
-                errorMessage={errors['cardHolderName'] || ''}
+                label="Nombre del titular"
+                placeholder="Indique el nombre del titular de la tarjeta"
+                name="name"
+                hasError={
+                  errors['paymentMethod.card.cardHolderName'] !== undefined
+                }
+                errorMessage={errors['paymentMethod.card.cardHolderName'] || ''}
               />
-              <div className='flex flex-row gap-1 max-w-lg'>
-                <div className='w-full'>
+              <div className="flex flex-row gap-1 max-w-lg">
+                <div className="w-full">
                   <InputField
                     onChange={(value) =>
                       handleCreditCardInfoChange(value, 'expirationMonth')
                     }
-                    label='Mes de vencimiento'
-                    placeholder='MM'
-                    name='expiry'
+                    label="Mes de vencimiento"
+                    placeholder="MM"
+                    name="expiry"
                     maxLength={2}
-                    hasError={errors['expirationMonth'] !== undefined}
-                    errorMessage={errors['expirationMonth'] || ''}
+                    hasError={
+                      errors['paymentMethod.card.expirationMonth'] !== undefined
+                    }
+                    errorMessage={
+                      errors['paymentMethod.card.expirationMonth'] || ''
+                    }
                   />
                 </div>
                 <div className="w-full">
@@ -477,27 +507,31 @@ export default function NewOrderPage({
                     onChange={(value) =>
                       handleCreditCardInfoChange(value, 'expirationYear')
                     }
-                    label='Año de vencimiento'
-                    placeholder='AA'
-                    name='expiry'
-                    maxLength={2}
-                    hasError={errors['expirationYear'] !== undefined}
-                    errorMessage={errors['expirationYear'] || ''}
+                    label="Año de vencimiento"
+                    placeholder="AAAA"
+                    name="expiry"
+                    maxLength={4}
+                    hasError={
+                      errors['paymentMethod.card.expirationYear'] !== undefined
+                    }
+                    errorMessage={
+                      errors['paymentMethod.card.expirationYear'] || ''
+                    }
                   />
                 </div>
               </div>
               <InputField
                 onChange={(value) => handleCreditCardInfoChange(value, 'cvc')}
-                label='CVC'
-                placeholder='Indique el CVV de la tarjeta'
-                name='cvc'
+                label="CVC"
+                placeholder="Indique el CVV de la tarjeta"
+                name="cvc"
                 maxLength={3}
-                hasError={errors['cvc'] !== undefined}
-                errorMessage={errors['cvc'] || ''}
+                hasError={errors['paymentMethod.card.cvc'] !== undefined}
+                errorMessage={errors['paymentMethod.card.cvc'] || ''}
               />
             </form>
             {order.paymentMethod.card && (
-              <div className='m-auto'>
+              <div className="m-auto">
                 <Cards
                   cvc={order.paymentMethod.card.cvc}
                   expiry={
@@ -515,10 +549,13 @@ export default function NewOrderPage({
           </div>
         </Card>
       )}
-      <div className='flex flex-col gap-1 items-end'>
-        <label className='bg-myYellow px-4 py-2 text-mainBlue rounded-lg hover:bg-myOrange w-full'>
-          <button onClick={handleCheckout} className='w-full font-semibold text-lg py-1 flex flex-row gap-2 items-center justify-center'>
-            <BsCheck className='text-3xl'/>
+      <div className="flex flex-col gap-1 items-end">
+        <label className="bg-myYellow px-4 py-2 text-mainBlue rounded-lg hover:bg-myOrange w-full">
+          <button
+            onClick={handleCheckout}
+            className="w-full font-semibold text-lg py-1 flex flex-row gap-2 items-center justify-center"
+          >
+            <BsCheck className="text-3xl" />
             Crear pedido
           </button>
         </label>

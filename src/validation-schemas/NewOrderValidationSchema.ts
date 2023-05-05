@@ -1,12 +1,17 @@
-import { object, string, number, date, boolean } from 'yup';
+import { boolean, date, number, object, string } from 'yup';
 export const NewOrderValidationSchema = object().shape({
   orderAmount: number()
     .min(0)
     .required('El costo del pedido es requerido')
     .typeError('El costo del pedido debe ser un número'),
   paymentAmount: number()
-    .min(0)
     .required('El monto a pagar es requerido')
+    .when('orderAmount', ([orderAmount], schema) => {
+      return schema.min(
+        orderAmount,
+        'El monto a pagar debe ser mayor o igual al costo del pedido'
+      );
+    })
     .typeError('El monto a pagar debe ser un número'),
   orderDate: date()
     .required('La fecha del pedido es requerida')
@@ -24,7 +29,17 @@ export const NewOrderValidationSchema = object().shape({
       minDate.setTime(minDate.getTime() + 60 * 60 * 1000);
       const maxDate = new Date();
       maxDate.setTime(maxDate.getTime() + 7 * 24 * 60 * 60 * 1000);
-      if (!asap) return schema.required('La fecha de entrega es requerida').min(minDate, 'La fecha y hora programada debe ser posterior a la próxima hora').max(maxDate, 'La fecha y hora programada no puede ser posterior a una semana');
+      if (!asap)
+        return schema
+          .required('La fecha de entrega es requerida')
+          .min(
+            minDate,
+            'La fecha y hora programada debe ser posterior a la próxima hora'
+          )
+          .max(
+            maxDate,
+            'La fecha y hora programada no puede ser posterior a una semana'
+          );
       return schema;
     })
     .typeError('La fecha de entrega debe ser una fecha'),
@@ -65,7 +80,6 @@ export const NewOrderValidationSchema = object().shape({
         )
     }),
     reference: string()
-      .required('La referencia de la ubicación de entrega es requerida')
       .typeError('La referencia de la ubicación de entrega debe ser un string')
   }),
   pickupLocation: object().shape({
@@ -105,7 +119,6 @@ export const NewOrderValidationSchema = object().shape({
         )
     }),
     reference: string()
-      .required('La referencia de la ubicación de recogida es requerida')
       .typeError('La referencia de la ubicación de recogida debe ser un string')
   }),
   orderDetails: string()
@@ -121,20 +134,13 @@ export const NewOrderValidationSchema = object().shape({
     paymentType: string()
       .required('El tipo de pago del método de pago es requerido')
       .typeError('El tipo de pago del método de pago debe ser un string'),
-    card: object()
-      .shape({
-        paymentType: string(),
-        cardHolderName: string(),
-        cardNumber: string(),
-        expirationMonth: string(),
-        expirationYear: string(),
-        cvc: string()
-      })
-      .when('paymentType', (paymentType: any, schema) => {
-        if (paymentType === 'card')
-          return schema.required('La tarjeta de crédito es requerida');
-        return schema;
-      })
+    card: object().shape({
+      cardNumber: string(),
+      cardHolderName: string(),
+      expirationMonth: string(),
+      expirationYear: string(),
+      cvc: string()
+    })
   }),
   bikerId: number(),
   status: string(),
