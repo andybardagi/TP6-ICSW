@@ -40,13 +40,14 @@ export default function NewOrderPage({
   >(undefined);
 
   const [selectedFile, setSelectedFile] = useState<File | undefined>();
-  const [previewUrl, setPreviewUrl] = useState<string | undefined>();
+  const [previewUrl, setPreviewUrl] = useState<string | undefined>(undefined);
 
   const handleFileInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
     const file = e.target.files[0];
-    // Verificar si el archivo es .jpg
-    if (file && file.type === 'image/jpg') {
+    // Verificar si el archivo es .jpeg
+
+    if (file && file.type === 'image/jpeg') {
       //Validate that file does not exceed 5MB
       if (file.size > 5 * 1024 * 1024) {
         toast.error('El archivo no puede superar los 5MB');
@@ -55,6 +56,7 @@ export default function NewOrderPage({
       setSelectedFile(file);
       setPreviewUrl(URL.createObjectURL(file));
     } else {
+      toast.error('El archivo debe ser .jpg');
       setSelectedFile(undefined);
       setPreviewUrl(undefined);
     }
