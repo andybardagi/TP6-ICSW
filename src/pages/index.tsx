@@ -44,9 +44,11 @@ export default function Home() {
             </button>
           </Link>
         </div>
-        <hr className="mt-4 mb-2 border"/>
+        <hr className="mt-4 mb-2 border" />
         <div className="flex flex-col gap-2">
-          <h6 className="text-center text-lg font-bold">Restaurantes adheridos</h6>
+          <h6 className="text-center text-lg font-bold">
+            Restaurantes adheridos
+          </h6>
           <div className="grid grid-cols-2 grid-rows-3 content-stretch gap-2">
             <div className="col-span-1 row-span-1 grid place-items-center h-32 rounded-lg bg-lightYellow">
               Restaurante 1
