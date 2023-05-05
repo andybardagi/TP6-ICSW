@@ -26,7 +26,7 @@ export default function SelectField<T>({
     <div className="flex flex-col gap-1">
       <label>{label}</label>
       <select
-        className={`border max-w-lg px-2 py-1 rounded-md ${hasError ? 'border-red-500' : 'border-cyan-600 '}`}
+        className={`border max-w-lg px-2 py-1 rounded-md ${hasError ? 'border-myRed' : 'border-myYellow '}`}
         onChange={(event) => onChange(event.target.value)}
         value={value}
       >
@@ -41,7 +41,7 @@ export default function SelectField<T>({
           </option>
         ))}
       </select>
-      {hasError ? <span className="text-red-500 text-sm">{errorMessage}</span> : null}
+      {hasError ? <span className="text-myRed text-sm">{errorMessage}</span> : null}
     </div>
   );
 }

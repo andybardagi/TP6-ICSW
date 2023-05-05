@@ -17,8 +17,8 @@ export default function Home() {
         <div
           className={`w-full flex flex-row items-center gap-2 rounded-full py-2 px-4 ${
             isActive
-              ? 'border-2 border-cyan-600 border-inside'
-              : 'border-2 border-slate-100'
+              ? 'border-2 border-myOrange border-inside'
+              : 'border-2 border-myYellow'
           }`}
         >
           <BsSearch />
@@ -39,7 +39,7 @@ export default function Home() {
             No encontrás lo que buscás?
           </h6>
           <Link href={'/order/new'}>
-            <button className="bg-sky-500 text-white font-semibold w-full h-fit px-auto py-2 text-large rounded-full">
+            <button className="bg-myYellow text-mainBlue font-semibold w-full h-fit px-auto py-2 text-large rounded-full hover:bg-myOrange">
               Pedí lo que sea a donde quieras!
             </button>
           </Link>
@@ -48,22 +48,22 @@ export default function Home() {
         <div className="flex flex-col gap-2">
           <h6 className="text-center text-lg font-bold">Restaurantes adheridos</h6>
           <div className="grid grid-cols-2 grid-rows-3 content-stretch gap-2">
-            <div className="col-span-1 row-span-1 grid place-items-center h-32 rounded-lg bg-sky-200">
+            <div className="col-span-1 row-span-1 grid place-items-center h-32 rounded-lg bg-lightYellow">
               Restaurante 1
             </div>
-            <div className="col-span-1 row-span-1 grid place-items-center h-32 rounded-lg bg-sky-400">
+            <div className="col-span-1 row-span-1 grid place-items-center h-32 rounded-lg bg-myYellow">
               Restaurante 2
             </div>
-            <div className="col-span-1 row-span-1 grid place-items-center h-32 rounded-lg bg-sky-400">
+            <div className="col-span-1 row-span-1 grid place-items-center h-32 rounded-lg bg-myYellow">
               Restaurante 3
             </div>
-            <div className="col-span-1 row-span-1 grid place-items-center h-32 rounded-lg bg-sky-200">
+            <div className="col-span-1 row-span-1 grid place-items-center h-32 rounded-lg bg-lightYellow">
               Restaurante 4
             </div>
-            <div className="col-span-1 row-span-1 grid place-items-center h-32 rounded-lg bg-sky-200">
+            <div className="col-span-1 row-span-1 grid place-items-center h-32 rounded-lg bg-lightYellow">
               Restaurante 5
             </div>
-            <div className="col-span-1 row-span-1 grid place-items-center h-32 rounded-lg bg-sky-400">
+            <div className="col-span-1 row-span-1 grid place-items-center h-32 rounded-lg bg-myYellow">
               Restaurante 6
             </div>
           </div>
