@@ -309,7 +309,7 @@ export default function NewOrderPage({
               render={(city) => city.name}
               label="Ciudad"
               placeholder="Seleccione la ciudad del comercio"
-              value={order.pickupLocation.city.name}
+              value={order.pickupLocation.city.id}
               hasError={errors['pickupLocation.city.id'] !== undefined}
               errorMessage={errors['pickupLocation.city.id'] || ''}
             />
