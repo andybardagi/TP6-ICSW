@@ -417,6 +417,7 @@ export default function NewOrderPage({
           placeholder="Seleccione la forma de pago"
           hasError={errors['paymentMethod.id'] !== undefined}
           errorMessage={errors['paymentMethod.id'] || ''}
+          value={order.paymentMethod.id}
         />
 
         <InputField

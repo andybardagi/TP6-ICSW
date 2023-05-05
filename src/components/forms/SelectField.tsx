@@ -33,7 +33,7 @@ export default function SelectField<T>({
         value={value}
       >
         {placeholder && (
-          <option value="" disabled selected>
+          <option value="" disabled selected hidden>
             {placeholder}
           </option>
         )}
