@@ -33,6 +33,7 @@ export const VisaCreditCardValidationSchema = object().shape({
           expirationMonth >= 1 &&
           expirationMonth <= 12 &&
           expirationMonth % 1 === 0;
+        return isValid;
       }
     )
     .typeError(
