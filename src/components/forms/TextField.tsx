@@ -12,7 +12,7 @@ export function TextField({ text, label, placeholder, hasError, errorMessage }: 
     <div className="flex flex-col gap-1">
       <label>{label}</label>
       <input
-        className={`border max-w-lg px-2 py-1 rounded-md ${hasError ? 'border-myRed' : 'border-myYellow '}`}
+        className={`border bg-lightYellow max-w-lg px-2 py-1 rounded-md ${hasError ? 'border-myRed' : 'border-myYellow '}`}
         placeholder={placeholder}
         value={text || placeholder}
         readOnly={true}

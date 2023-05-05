@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useMemo } from 'react';
 type InputProps = {
   onChange: (value: string) => void;
   label?: string;
@@ -23,6 +23,11 @@ export default function InputField({
   errorMessage,
 
 }: InputProps) {
+
+
+  const resValue = useMemo(() => value, [value]);
+    
+
   return (
     <div className="flex flex-col gap-1">
       <label>{label}</label>
@@ -30,10 +35,10 @@ export default function InputField({
         name={name}
         type={type}
         maxLength={maxLength}
-        className={`border max-w-lg px-2 py-1 rounded-md ${hasError ? 'border-myRed' : 'border-myYellow '}`}
+        className={`border w-full max-w-lg px-2 py-1 rounded-md ${hasError ? 'border-myRed' : 'border-myYellow '}`}
         placeholder={placeholder}
         onChange={(event) => onChange(event.target.value)}
-        value={value}
+        value={resValue}
         
       />
       {hasError ? <span className="text-myRed text-sm">{errorMessage}</span> : null}

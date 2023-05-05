@@ -19,8 +19,12 @@ export const NewOrderValidationSchema = object().shape({
     .required('El pedido asap es requerido')
     .typeError('El pedido asap debe ser un booleano'),
   deliveryDate: date()
-    .when('asap', (asap, schema) => {
-      if (!asap) return schema.required('La fecha de entrega es requerida');
+    .when('asap', ([asap], schema) => {
+      const minDate = new Date();
+      minDate.setTime(minDate.getTime() + 60 * 60 * 1000);
+      const maxDate = new Date();
+      maxDate.setTime(maxDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+      if (!asap) return schema.required('La fecha de entrega es requerida').min(minDate, 'La fecha y hora programada debe ser posterior a la próxima hora').max(maxDate, 'La fecha y hora programada no puede ser posterior a una semana');
       return schema;
     })
     .typeError('La fecha de entrega debe ser una fecha'),
