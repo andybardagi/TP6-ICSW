@@ -1,4 +1,3 @@
-import cardValidator from 'card-validator';
 import { boolean, date, number, object, string } from 'yup';
 export const NewOrderValidationSchema = object().shape({
   orderAmount: number()
@@ -6,8 +5,13 @@ export const NewOrderValidationSchema = object().shape({
     .required('El costo del pedido es requerido')
     .typeError('El costo del pedido debe ser un número'),
   paymentAmount: number()
-    .min(0)
     .required('El monto a pagar es requerido')
+    .when('orderAmount', ([orderAmount], schema) => {
+      return schema.min(
+        orderAmount,
+        'El monto a pagar debe ser mayor o igual al costo del pedido'
+      );
+    })
     .typeError('El monto a pagar debe ser un número'),
   orderDate: date()
     .required('La fecha del pedido es requerida')
@@ -76,7 +80,6 @@ export const NewOrderValidationSchema = object().shape({
         )
     }),
     reference: string()
-      .required('La referencia de la ubicación de entrega es requerida')
       .typeError('La referencia de la ubicación de entrega debe ser un string')
   }),
   pickupLocation: object().shape({
@@ -116,7 +119,6 @@ export const NewOrderValidationSchema = object().shape({
         )
     }),
     reference: string()
-      .required('La referencia de la ubicación de recogida es requerida')
       .typeError('La referencia de la ubicación de recogida debe ser un string')
   }),
   orderDetails: string()
@@ -132,14 +134,13 @@ export const NewOrderValidationSchema = object().shape({
     paymentType: string()
       .required('El tipo de pago del método de pago es requerido')
       .typeError('El tipo de pago del método de pago debe ser un string'),
-    card: object()
-      .shape({
-        cardNumber: string(),
-        cardHolderName: string(),
-        expirationMonth: string(),
-        expirationYear: string(),
-        cvc: string()
-      })
+    card: object().shape({
+      cardNumber: string(),
+      cardHolderName: string(),
+      expirationMonth: string(),
+      expirationYear: string(),
+      cvc: string()
+    })
   }),
   bikerId: number(),
   status: string(),

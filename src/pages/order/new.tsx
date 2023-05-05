@@ -340,6 +340,7 @@ export default function NewOrderPage({
                 handleLocationChange(value, 'pickupLocation', 'reference')
               }
               label="Referencia"
+              isOptional
               placeholder="Ayuda al repartidor a encontrar el comercio"
               hasError={errors['pickupLocation.reference'] !== undefined}
               errorMessage={errors['pickupLocation.reference'] || ''}
@@ -391,6 +392,7 @@ export default function NewOrderPage({
             handleLocationChange(value, 'deliveryLocation', 'reference')
           }
           label="Referencia"
+          isOptional
           placeholder="Ayuda al repartidor a encontrar tu domicilio"
           hasError={errors['deliveryLocation.reference'] !== undefined}
           errorMessage={errors['deliveryLocation.reference'] || ''}
@@ -492,9 +494,9 @@ export default function NewOrderPage({
                       handleCreditCardInfoChange(value, 'expirationYear')
                     }
                     label="Año de vencimiento"
-                    placeholder="AA"
+                    placeholder="AAAA"
                     name="expiry"
-                    maxLength={2}
+                    maxLength={4}
                     hasError={
                       errors['paymentMethod.card.expirationYear'] !== undefined
                     }

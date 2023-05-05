@@ -9,6 +9,7 @@ type InputProps = {
   type?: string;
   hasError?: boolean;
   errorMessage?: string;
+  isOptional?: boolean;
 };
 
 export default function InputField({
@@ -20,7 +21,8 @@ export default function InputField({
   maxLength,
   type = 'text',
   hasError,
-  errorMessage
+  errorMessage,
+  isOptional = false
 }: InputProps) {
 
 
@@ -29,7 +31,7 @@ export default function InputField({
 
   return (
     <div className="flex flex-col gap-1">
-      <label>{label}</label>
+      <label>{label} {isOptional ? <span className='text-slate-600 text-sm'>(Opcional)</span> : null}</label>
       <input
         name={name}
         type={type}
