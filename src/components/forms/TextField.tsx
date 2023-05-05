@@ -18,8 +18,8 @@ export function TextField({
     <div className="flex flex-col gap-1">
       <label>{label}</label>
       <input
-        className={`border max-w-lg px-2 py-1 rounded-md ${
-          hasError ? 'border-myRed' : 'border-myYellow '
+        className={`border max-w-lg px-2 py-1 rounded-md bg-lightYellow ${
+          hasError ? 'border-myRed' : 'border-myYellow'
         }`}
         placeholder={placeholder}
         value={text || placeholder}

@@ -6,8 +6,5 @@ export default async function checkoutOrder(order: Order) {
     body: JSON.stringify(order)
   });
   const resultData = await result.json();
-  if (!result.ok) {
-    throw new Error(resultData);
-  }
   return resultData;
 }
