@@ -28,7 +28,6 @@ type NewOrderPageProps = {
   paymentMethods: PaymentMethod[];
 };
 
-
 export default function NewOrderPage({
   cities,
   paymentMethods
@@ -46,8 +45,8 @@ export default function NewOrderPage({
   const handleFileInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
     const file = e.target.files[0];
-    // Verificar si el archivo es .png
-    if (file && file.type === 'image/png') {
+    // Verificar si el archivo es .jpg
+    if (file && file.type === 'image/jpg') {
       //Validate that file does not exceed 5MB
       if (file.size > 5 * 1024 * 1024) {
         toast.error('El archivo no puede superar los 5MB');
