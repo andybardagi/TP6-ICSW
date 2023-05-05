@@ -17,17 +17,17 @@ import { ValidationError } from 'yup';
 import checkoutOrder from '@/helpers/checkoutOrder';
 
 const MapView = dynamic(() => import('../../components/map/MapView'), {
-  ssr: false,
+  ssr: false
 });
 
 type NewOrderPageProps = {
-  cities: City[]
-  paymentMethods: PaymentMethod[]
-}
+  cities: City[];
+  paymentMethods: PaymentMethod[];
+};
 
 export default function NewOrderPage({
   cities,
-  paymentMethods,
+  paymentMethods
 }: NewOrderPageProps) {
   const [order, setOrder] = useState<Order>({
     orderAmount: 0,
@@ -40,13 +40,13 @@ export default function NewOrderPage({
       street: '',
       number: 0,
       city: { name: '', id: '', latitud: 0, longitud: 0 },
-      reference: '',
+      reference: ''
     },
     pickupLocation: {
       street: '',
       number: 0,
       city: { name: '', id: '', latitud: 0, longitud: 0 },
-      reference: '',
+      reference: ''
     },
     orderDetails: '',
     paymentMethod: {
@@ -58,9 +58,9 @@ export default function NewOrderPage({
         cardHolderName: '',
         expirationMonth: '',
         cvc: '',
-        expirationYear: '',
-      },
-    },
+        expirationYear: ''
+      }
+    }
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -75,7 +75,7 @@ export default function NewOrderPage({
   ) => {
     setOrder((o) => ({
       ...o,
-      [config]: { ...o[config], [attr]: value },
+      [config]: { ...o[config], [attr]: value }
     }));
 
     if (config != 'pickupLocation') return;
@@ -96,8 +96,8 @@ export default function NewOrderPage({
       ...o,
       [config]: {
         ...o[config],
-        city: city ?? { name: '', id: '', latitud: 0, longitud: 0 },
-      },
+        city: city ?? { name: '', id: '', latitud: 0, longitud: 0 }
+      }
     }));
     if (value != '') {
       handleLocationChange('', 'pickupLocation', 'street');
@@ -115,8 +115,8 @@ export default function NewOrderPage({
       paymentMethod: paymentMethod ?? {
         name: '',
         id: '',
-        paymentType: PaymentType.Cash,
-      },
+        paymentType: PaymentType.Cash
+      }
     }));
   };
 
@@ -138,9 +138,9 @@ export default function NewOrderPage({
           ...prevOrder.paymentMethod,
           card: {
             ...prevOrder.paymentMethod.card,
-            [atr]: value,
-          },
-        },
+            [atr]: value
+          }
+        }
       };
     });
   };
@@ -172,7 +172,7 @@ export default function NewOrderPage({
 
   const [address, setAddress] = useState<Address>({
     latitud: -31.416668,
-    longitud: -64.183334,
+    longitud: -64.183334
   });
 
   const [inputValueStreet, setInputValueStreet] = useState('');
@@ -185,28 +185,27 @@ export default function NewOrderPage({
   const handleCheckout = async () => {
     try {
       setErrors({});
-      await NewOrderValidationSchema.validate(
-        order,
-        {
-          abortEarly: false,
-        }
-      ).then(async () => {
-        const result = await checkoutOrder(order);
-        console.log(result);
-        if (result.result === 'OK') {
-          // Resetear el formulario.
-        } else {
-          alert(result.message);
-        }
-      }).catch((err: unknown) => {
-        if (err instanceof ValidationError) {
-          console.log(getErrorsMap(err));
-          setErrors(getErrorsMap(err));
-        } else {
-          alert(err);
-          console.log(err);
-        }
-      });
+      await NewOrderValidationSchema.validate(order, {
+        abortEarly: false
+      })
+        .then(async () => {
+          const result = await checkoutOrder(order);
+          console.log(result);
+          if (result.result === 'OK') {
+            // Resetear el formulario.
+          } else {
+            alert(result.message);
+          }
+        })
+        .catch((err: unknown) => {
+          if (err instanceof ValidationError) {
+            console.log(getErrorsMap(err));
+            setErrors(getErrorsMap(err));
+          } else {
+            alert(err);
+            console.log(err);
+          }
+        });
     } catch (err) {
       alert(err);
     }
@@ -228,7 +227,10 @@ export default function NewOrderPage({
         />
 
         <div className="flex flex-col gap-1">
-          <label htmlFor="file" className="bg-myYellow px-4 py-2 text-mainBlue rounded-lg hover:bg-myOrange w-fit">
+          <label
+            htmlFor="file"
+            className="bg-myYellow px-4 py-2 text-mainBlue rounded-lg hover:bg-myOrange w-fit"
+          >
             Foto
           </label>
           <input id="file" type="file" className="max-w-lg hidden" />
@@ -271,7 +273,7 @@ export default function NewOrderPage({
                       ...o,
                       deliveryDate: !e.target.value
                         ? undefined
-                        : new Date(e.target.value),
+                        : new Date(e.target.value)
                     }));
                   }}
                 />
@@ -315,7 +317,7 @@ export default function NewOrderPage({
               }
               label="Número del comercio"
               placeholder="Indique el número de la calle de su comercio"
-              type='number'
+              type="number"
               value={inputValueNumber}
               hasError={errors['pickupLocation.number'] !== undefined}
               errorMessage={errors['pickupLocation.number'] || ''}
@@ -358,10 +360,9 @@ export default function NewOrderPage({
           }
           label="Número de la calle"
           placeholder="Indique el número de la calle donde debe ser entregado el pedido"
-          type='number'
+          type="number"
           hasError={errors['deliveryLocation.number'] !== undefined}
           errorMessage={errors['deliveryLocation.number'] || ''}
-
         />
         <InputField
           onChange={(value) =>
@@ -397,8 +398,7 @@ export default function NewOrderPage({
           label="Monto del pedido"
           placeholder="Indique el monto del pedido"
           value={`$ ${order.orderAmount.toString()}`}
-          onChange={() => { }}
-
+          onChange={() => {}}
         />
 
         {order.paymentMethod.paymentType === PaymentType.Cash && (
@@ -504,9 +504,7 @@ export default function NewOrderPage({
         </Card>
       )}
       <div className="flex flex-col gap-1 items-end">
-        <label
-          className="bg-myYellow px-4 py-2 text-mainBlue rounded-lg hover:bg-myOrange w-fit"
-        >
+        <label className="bg-myYellow px-4 py-2 text-mainBlue rounded-lg hover:bg-myOrange w-fit">
           <button onClick={handleCheckout} role="none">
             Crear pedido
           </button>
@@ -517,7 +515,9 @@ export default function NewOrderPage({
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const citiesResData = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/cities`);
+  const citiesResData = await fetch(
+    `${process.env.NEXT_PUBLIC_URL}/api/cities`
+  );
   const cities = await citiesResData.json();
 
   const paymentMethodsResData = await fetch(
@@ -528,7 +528,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   return {
     props: {
       cities,
-      paymentMethods,
-    },
+      paymentMethods
+    }
   };
 };
