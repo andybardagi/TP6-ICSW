@@ -7,10 +7,10 @@ import ReactDOMServer from 'react-dom/server';
 import { Recenter } from './Recenter';
 
 interface MapViewProps {
-  onChange: (lat: number, lng: number) => void
-  latitud: number
-  longitud: number
-  address: Address
+  onChange: (lat: number, lng: number) => void;
+  latitud: number;
+  longitud: number;
+  address: Address;
 }
 
 const MapView = ({ onChange, latitud, longitud, address }: MapViewProps) => {
@@ -22,7 +22,7 @@ const MapView = ({ onChange, latitud, longitud, address }: MapViewProps) => {
     className: 'custom-icon',
     html: ReactDOMServer.renderToString(
       <BsFillPinFill className="text-3xl text-myRed" />
-    ),
+    )
   });
 
   useEffect(() => {
@@ -37,7 +37,7 @@ const MapView = ({ onChange, latitud, longitud, address }: MapViewProps) => {
         onChange(lat, lng);
         setCenter({ lat, lng });
         setPosition({ lat, lng });
-      },
+      }
     });
     return null;
   };

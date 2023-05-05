@@ -19,7 +19,7 @@ import { emptyOrder } from '@/helpers/emptyOrder';
 import { BsCheck, BsXCircleFill } from 'react-icons/bs';
 
 const MapView = dynamic(() => import('../../components/map/MapView'), {
-  ssr: false,
+  ssr: false
 });
 
 type NewOrderPageProps = {
@@ -29,7 +29,7 @@ type NewOrderPageProps = {
 
 export default function NewOrderPage({
   cities,
-  paymentMethods,
+  paymentMethods
 }: NewOrderPageProps) {
   const [order, setOrder] = useState<Order>(emptyOrder);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -67,7 +67,7 @@ export default function NewOrderPage({
   ) => {
     setOrder((o) => ({
       ...o,
-      [config]: { ...o[config], [attr]: value },
+      [config]: { ...o[config], [attr]: value }
     }));
 
     if (config != 'pickupLocation') return;
@@ -88,8 +88,8 @@ export default function NewOrderPage({
       ...o,
       [config]: {
         ...o[config],
-        city: city ?? { name: '', id: '', latitud: 0, longitud: 0 },
-      },
+        city: city ?? { name: '', id: '', latitud: 0, longitud: 0 }
+      }
     }));
     if (value != '') {
       handleLocationChange('', 'pickupLocation', 'street');
@@ -107,8 +107,8 @@ export default function NewOrderPage({
       paymentMethod: paymentMethod ?? {
         name: '',
         id: '',
-        paymentType: PaymentType.Cash,
-      },
+        paymentType: PaymentType.Cash
+      }
     }));
   };
 
@@ -130,9 +130,9 @@ export default function NewOrderPage({
           ...prevOrder.paymentMethod,
           card: {
             ...prevOrder.paymentMethod.card,
-            [atr]: value,
-          },
-        },
+            [atr]: value
+          }
+        }
       };
     });
   };
@@ -164,7 +164,7 @@ export default function NewOrderPage({
 
   const [address, setAddress] = useState<Address>({
     latitud: -31.416668,
-    longitud: -64.183334,
+    longitud: -64.183334
   });
 
   const [inputValueStreet, setInputValueStreet] = useState('');
@@ -275,7 +275,7 @@ export default function NewOrderPage({
                       ...o,
                       deliveryDate: !e.target.value
                         ? undefined
-                        : new Date(e.target.value),
+                        : new Date(e.target.value)
                     }));
                   }}
                 />
@@ -541,7 +541,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   return {
     props: {
       cities,
-      paymentMethods,
-    },
+      paymentMethods
+    }
   };
 };

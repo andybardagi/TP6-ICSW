@@ -62,11 +62,11 @@ export const NewOrderValidationSchema = object().shape({
         )
         .typeError(
           'La longitud de la ciudad de la ubicación de entrega debe ser un número'
-        ),
+        )
     }),
     reference: string()
       .required('La referencia de la ubicación de entrega es requerida')
-      .typeError('La referencia de la ubicación de entrega debe ser un string'),
+      .typeError('La referencia de la ubicación de entrega debe ser un string')
   }),
   pickupLocation: object().shape({
     street: string()
@@ -102,11 +102,11 @@ export const NewOrderValidationSchema = object().shape({
         )
         .typeError(
           'La longitud de la ciudad de la ubicación de recogida debe ser un número'
-        ),
+        )
     }),
     reference: string()
       .required('La referencia de la ubicación de recogida es requerida')
-      .typeError( 'La referencia de la ubicación de recogida debe ser un string'),
+      .typeError('La referencia de la ubicación de recogida debe ser un string')
   }),
   orderDetails: string()
     .required('Los detalles del pedido son requeridos')
@@ -121,19 +121,22 @@ export const NewOrderValidationSchema = object().shape({
     paymentType: string()
       .required('El tipo de pago del método de pago es requerido')
       .typeError('El tipo de pago del método de pago debe ser un string'),
-    card: object().shape({
-      paymentType: string(),
-      cardHolderName: string(),
-      cardNumber: string(),
-      expirationMonth: string(),
-      expirationYear: string(),
-      cvc: string(),
-    }).when('paymentType', (paymentType: any, schema) => {
-      if (paymentType === 'card') return schema.required('La tarjeta de crédito es requerida');
-      return schema;
-    }),
+    card: object()
+      .shape({
+        paymentType: string(),
+        cardHolderName: string(),
+        cardNumber: string(),
+        expirationMonth: string(),
+        expirationYear: string(),
+        cvc: string()
+      })
+      .when('paymentType', (paymentType: any, schema) => {
+        if (paymentType === 'card')
+          return schema.required('La tarjeta de crédito es requerida');
+        return schema;
+      })
   }),
   bikerId: number(),
   status: string(),
-  id: number(),
+  id: number()
 });
