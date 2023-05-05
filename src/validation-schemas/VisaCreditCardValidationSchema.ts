@@ -34,6 +34,9 @@ export const VisaCreditCardValidationSchema = object().shape({
           expirationMonth <= 12 &&
           expirationMonth % 1 === 0;
       }
+    )
+    .typeError(
+      'El mes de expiración de la tarjeta de crédito debe ser un número entero'
     ),
   expirationYear: number()
     .required('El año de expiración es requerido')
