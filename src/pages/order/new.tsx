@@ -3,22 +3,21 @@ import SelectField from '@/components/forms/SelectField';
 import { TextField } from '@/components/forms/TextField';
 import Card from '@/components/layout/Card';
 import { calculateOrderAmount } from '@/helpers/calculateOrderAmount';
-import { getErrorsMap } from '@/helpers/getErrorsMap';
+import checkoutOrder from '@/helpers/checkoutOrder';
+import { emptyOrder } from '@/helpers/emptyOrder';
+import { validateNewOrder } from '@/helpers/validateNewOrder';
 import { City } from '@/models/City';
 import { Order } from '@/models/Order';
 import { PaymentMethod, PaymentType } from '@/models/PaymentMethod';
-import { NewOrderValidationSchema } from '@/validation-schemas/NewOrderValidationSchema';
 import { GetServerSideProps } from 'next';
 import dynamic from 'next/dynamic';
+import { Inter } from 'next/font/google';
 import { ChangeEvent, useState } from 'react';
 import Cards from 'react-credit-cards';
 import 'react-credit-cards/es/styles-compiled.css';
-import { ValidationError } from 'yup';
-import checkoutOrder from '@/helpers/checkoutOrder';
-import { emptyOrder } from '@/helpers/emptyOrder';
 import { BsCheck, BsXCircleFill } from 'react-icons/bs';
-import { VisaCreditCardValidationSchema } from '@/validation-schemas/VisaCreditCardValidationSchema';
-import { validateNewOrder } from '@/helpers/validateNewOrder';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const MapView = dynamic(() => import('../../components/map/MapView'), {
   ssr: false
@@ -28,6 +27,7 @@ type NewOrderPageProps = {
   cities: City[];
   paymentMethods: PaymentMethod[];
 };
+
 
 export default function NewOrderPage({
   cities,
@@ -50,7 +50,7 @@ export default function NewOrderPage({
     if (file && file.type === 'image/png') {
       //Validate that file does not exceed 5MB
       if (file.size > 5 * 1024 * 1024) {
-        alert('El archivo no puede superar los 5MB');
+        toast.error('El archivo no puede superar los 5MB');
         return;
       }
       setSelectedFile(file);
@@ -195,17 +195,19 @@ export default function NewOrderPage({
         setInputValueNumber('');
         setInputValueReference('');
         setErrors({});
-        alert(result.message);
+        toast.success(result.message);
       } else {
-        alert(result.message);
+        toast.error(result.message);
       }
     } catch (err) {
-      alert(err);
+      console.error(err);
+      toast.error('Ocurrió un error al crear el pedido');
     }
   };
 
   return (
     <div className="flex flex-col gap-4 p-5">
+      <ToastContainer />
       <h1 className="text-2xl font-bold mt-2 mb-0">Nuevo pedido</h1>
       <Card title="Productos">
         <InputField
