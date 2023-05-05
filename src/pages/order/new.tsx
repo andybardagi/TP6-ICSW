@@ -18,6 +18,7 @@ import checkoutOrder from '@/helpers/checkoutOrder';
 import { emptyOrder } from '@/helpers/emptyOrder';
 import { BsCheck, BsXCircleFill } from 'react-icons/bs';
 import { VisaCreditCardValidationSchema } from '@/validation-schemas/VisaCreditCardValidationSchema';
+import { validateNewOrder } from '@/helpers/validateNewOrder';
 
 const MapView = dynamic(() => import('../../components/map/MapView'), {
   ssr: false
@@ -175,54 +176,17 @@ export default function NewOrderPage({
 
   const handleCheckout = async () => {
     try {
-      setErrors({});
-      let newErrors: Record<string, string> = {};
-      let hasErrors = false;
-
-      await NewOrderValidationSchema.validate(order, {
-        abortEarly: false
-      })
-        .then(async () => {})
-        .catch((err: unknown) => {
-          if (err instanceof ValidationError) {
-            newErrors = { ...newErrors, ...getErrorsMap(err) };
-            hasErrors = true;
-          } else {
-            console.error(err);
-          }
-        });
-      if (order.paymentMethod.paymentType === PaymentType.Card) {
-        await VisaCreditCardValidationSchema.validate(
-          order.paymentMethod.card,
-          { abortEarly: false }
-        )
-          .then(() => {})
-          .catch((err: unknown) => {
-            if (err instanceof ValidationError) {
-              const creditCartErrors = getErrorsMap(err);
-              const creditCartErrorsAdjust: Record<string, string> = {};
-              Object.entries(creditCartErrors).forEach(([key, value]) => {
-                creditCartErrorsAdjust[`paymentMethod.card.${key}`] = value;
-              });
-              newErrors = { ...newErrors, ...creditCartErrorsAdjust };
-              hasErrors = true;
-            } else {
-              console.error(err);
-            }
-          });
-      }
-      if (hasErrors) {
-        console.log('Here', newErrors);
-        setErrors(newErrors);
+      const validationResult = await validateNewOrder(order);
+      if (!validationResult.valid) {
+        setErrors(validationResult.errors);
         return;
+      }
+      const result = await checkoutOrder(order);
+      if (result.result === 'OK') {
+        setOrder(emptyOrder);
+        alert(result.message);
       } else {
-        const result = await checkoutOrder(order);
-        if (result.result === 'OK') {
-          setOrder(emptyOrder);
-          alert(result.message);
-        } else {
-          alert(result.message);
-        }
+        alert(result.message);
       }
     } catch (err) {
       alert(err);
