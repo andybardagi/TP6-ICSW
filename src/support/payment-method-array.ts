@@ -4,7 +4,7 @@ export const paymentMethodArray: PaymentMethod[] = [
   {
     id: '1',
     name: 'Efectivo',
-    paymentType: PaymentType.Cash,
+    paymentType: PaymentType.Cash
   },
   {
     id: '2',

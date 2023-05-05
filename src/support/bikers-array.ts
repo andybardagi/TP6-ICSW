@@ -4,31 +4,31 @@ export const bikersArray: Biker[] = [
   {
     id: 1,
     name: 'Juan',
-    lastName: 'Perez',
+    lastName: 'Perez'
   },
   {
     id: 2,
     name: 'Pedro',
-    lastName: 'Gomez',
+    lastName: 'Gomez'
   },
   {
     id: 3,
     name: 'Maria',
-    lastName: 'Gonzalez',
+    lastName: 'Gonzalez'
   },
   {
     id: 4,
     name: 'Jose',
-    lastName: 'Rodriguez',
+    lastName: 'Rodriguez'
   },
   {
     id: 5,
     name: 'Luis',
-    lastName: 'Fernandez',
+    lastName: 'Fernandez'
   },
   {
     id: 6,
     name: 'Ana',
-    lastName: 'Martinez',
+    lastName: 'Martinez'
   }
 ];
