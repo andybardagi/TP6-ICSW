@@ -1,4 +1,4 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
+import type { NextApiRequest, NextApiResponse } from 'next';
 import { City } from '@/models/City';
 import { citiesArray } from '@/support/cities-array';
 

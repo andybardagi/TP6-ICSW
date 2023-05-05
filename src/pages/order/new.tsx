@@ -1,24 +1,24 @@
-import InputField from '@/components/forms/InputField'
-import SelectField from '@/components/forms/SelectField'
-import { TextField } from '@/components/forms/TextField'
-import Card from '@/components/layout/Card'
-import { calculateOrderAmount } from '@/helpers/calculateOrderAmount'
-import { getErrorsMap } from '@/helpers/getErrorsMap'
-import { City } from '@/models/City'
-import { Order } from '@/models/Order'
-import { PaymentMethod, PaymentType } from '@/models/PaymentMethod'
-import { NewOrderValidationSchema } from '@/validation-schemas/NewOrderValidationSchema'
-import { GetServerSideProps } from 'next'
-import dynamic from 'next/dynamic'
-import { useState } from 'react'
-import Cards from 'react-credit-cards'
-import 'react-credit-cards/es/styles-compiled.css'
-import { ValidationError } from 'yup'
+import InputField from '@/components/forms/InputField';
+import SelectField from '@/components/forms/SelectField';
+import { TextField } from '@/components/forms/TextField';
+import Card from '@/components/layout/Card';
+import { calculateOrderAmount } from '@/helpers/calculateOrderAmount';
+import { getErrorsMap } from '@/helpers/getErrorsMap';
+import { City } from '@/models/City';
+import { Order } from '@/models/Order';
+import { PaymentMethod, PaymentType } from '@/models/PaymentMethod';
+import { NewOrderValidationSchema } from '@/validation-schemas/NewOrderValidationSchema';
+import { GetServerSideProps } from 'next';
+import dynamic from 'next/dynamic';
+import { useState } from 'react';
+import Cards from 'react-credit-cards';
+import 'react-credit-cards/es/styles-compiled.css';
+import { ValidationError } from 'yup';
 import checkoutOrder from '@/helpers/checkoutOrder';
 
 const MapView = dynamic(() => import('../../components/map/MapView'), {
   ssr: false,
-})
+});
 
 type NewOrderPageProps = {
   cities: City[]
@@ -61,12 +61,12 @@ export default function NewOrderPage({
         expirationYear: '',
       },
     },
-  })
-  const [errors, setErrors] = useState<Record<string, string>>({})
+  });
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const [focused, setFocused] = useState<
     'name' | 'number' | 'expiry' | 'cvc' | undefined
-  >(undefined)
+  >(undefined);
 
   const handleLocationChange = (
     value: string,
@@ -76,40 +76,40 @@ export default function NewOrderPage({
     setOrder((o) => ({
       ...o,
       [config]: { ...o[config], [attr]: value },
-    }))
+    }));
 
-    if (config != 'pickupLocation') return
+    if (config != 'pickupLocation') return;
 
     if (attr === 'street') {
-      setInputValueStreet(value)
+      setInputValueStreet(value);
     } else if (attr === 'number') {
-      setInputValueNumber(value)
+      setInputValueNumber(value);
     }
-  }
+  };
 
   const handleCityChange = (
     value: string,
     config: 'deliveryLocation' | 'pickupLocation'
   ) => {
-    const city = cities.find((c) => c.id === value)
+    const city = cities.find((c) => c.id === value);
     setOrder((o) => ({
       ...o,
       [config]: {
         ...o[config],
         city: city ?? { name: '', id: '', latitud: 0, longitud: 0 },
       },
-    }))
+    }));
     if (value != '') {
-      handleLocationChange('', 'pickupLocation', 'street')
-      handleLocationChange('', 'pickupLocation', 'number')
+      handleLocationChange('', 'pickupLocation', 'street');
+      handleLocationChange('', 'pickupLocation', 'number');
       //setSelectValueCity(city?.name || '')
     }
-    setLatitud(city?.latitud || 0)
-    setLongitud(city?.longitud || 0)
-  }
+    setLatitud(city?.latitud || 0);
+    setLongitud(city?.longitud || 0);
+  };
 
   const handlePaymentMethodChange = (value: string) => {
-    const paymentMethod = paymentMethods.find((c) => c.id === value)
+    const paymentMethod = paymentMethods.find((c) => c.id === value);
     setOrder((o) => ({
       ...o,
       paymentMethod: paymentMethod ?? {
@@ -117,8 +117,8 @@ export default function NewOrderPage({
         id: '',
         paymentType: PaymentType.Cash,
       },
-    }))
-  }
+    }));
+  };
 
   const handleCreditCardInfoChange = (
     value: string | number,
@@ -130,8 +130,8 @@ export default function NewOrderPage({
       | 'cvc'
   ) => {
     setOrder((prevOrder) => {
-      if (!prevOrder.paymentMethod.card) return prevOrder
-      if (!(atr in prevOrder.paymentMethod.card)) return prevOrder
+      if (!prevOrder.paymentMethod.card) return prevOrder;
+      if (!(atr in prevOrder.paymentMethod.card)) return prevOrder;
       return {
         ...prevOrder,
         paymentMethod: {
@@ -141,46 +141,46 @@ export default function NewOrderPage({
             [atr]: value,
           },
         },
-      }
-    })
-  }
+      };
+    });
+  };
 
   const handleMapClick = async (lat: number, lng: number) => {
     const response = await fetch(
       `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`
-    )
-    const data = await response.json()
-    const { address } = data
-    setAddress({ latitud: lat, longitud: lng })
-    const city = cities.find((c) => c.name === address?.city)
+    );
+    const data = await response.json();
+    const { address } = data;
+    setAddress({ latitud: lat, longitud: lng });
+    const city = cities.find((c) => c.name === address?.city);
     if (city?.name === 'Córdoba') {
-      handleCityChange(city?.id || '', 'pickupLocation')
-      handleCityChange(city?.id || '', 'deliveryLocation')
-      handleLocationChange(address?.road || '', 'pickupLocation', 'street')
+      handleCityChange(city?.id || '', 'pickupLocation');
+      handleCityChange(city?.id || '', 'deliveryLocation');
+      handleLocationChange(address?.road || '', 'pickupLocation', 'street');
       handleLocationChange(
         address?.house_number || '',
         'pickupLocation',
         'number'
-      )
+      );
     } else {
-      handleLocationChange('', 'pickupLocation', 'street')
-      handleLocationChange('', 'pickupLocation', 'number')
+      handleLocationChange('', 'pickupLocation', 'street');
+      handleLocationChange('', 'pickupLocation', 'number');
     }
-    setLatitud(lat)
-    setLongitud(lng)
-  }
+    setLatitud(lat);
+    setLongitud(lng);
+  };
 
   const [address, setAddress] = useState<Address>({
     latitud: -31.416668,
     longitud: -64.183334,
-  })
+  });
 
-  const [inputValueStreet, setInputValueStreet] = useState('')
-  const [inputValueNumber, setInputValueNumber] = useState('')
-  const [selectValueCity, setSelectValueCity] = useState('')
+  const [inputValueStreet, setInputValueStreet] = useState('');
+  const [inputValueNumber, setInputValueNumber] = useState('');
+  const [selectValueCity, setSelectValueCity] = useState('');
 
-  const [latitud, setLatitud] = useState(-31.416668)
-  const [longitud, setLongitud] = useState(-64.183334)
+  const [latitud, setLatitud] = useState(-31.416668);
+  const [longitud, setLongitud] = useState(-64.183334);
 
   const handleCheckout = async () => {
     try {
@@ -191,26 +191,26 @@ export default function NewOrderPage({
           abortEarly: false,
         }
       ).then(async () => {
-        const result = await checkoutOrder(order)
-        console.log(result)
+        const result = await checkoutOrder(order);
+        console.log(result);
         if (result.result === 'OK') {
           // Resetear el formulario.
         } else {
-          alert(result.message)
+          alert(result.message);
         }
       }).catch((err: unknown) => {
         if (err instanceof ValidationError) {
           console.log(getErrorsMap(err));
-          setErrors(getErrorsMap(err))
+          setErrors(getErrorsMap(err));
         } else {
-          alert(err)
+          alert(err);
           console.log(err);
         }
-      })
+      });
     } catch (err) {
       alert(err);
     }
-  }
+  };
 
   return (
     <div className="flex flex-col gap-4 p-5">
@@ -218,8 +218,8 @@ export default function NewOrderPage({
       <Card title="Productos">
         <InputField
           onChange={(v) => {
-            setOrder((o) => ({ ...o, orderDetails: v }))
-            setOrder((o) => ({ ...o, orderAmount: calculateOrderAmount() }))
+            setOrder((o) => ({ ...o, orderDetails: v }));
+            setOrder((o) => ({ ...o, orderAmount: calculateOrderAmount() }));
           }}
           label="¿Qué debe buscar el cadete?"
           placeholder="Cuéntanos que debe buscar el cadete"
@@ -244,7 +244,7 @@ export default function NewOrderPage({
                 name="deliver-time"
                 id="now"
                 onChange={() => {
-                  setOrder((o) => ({ ...o, asap: true }))
+                  setOrder((o) => ({ ...o, asap: true }));
                 }}
               />
               <label htmlFor="now">Lo antes posible</label>
@@ -255,7 +255,7 @@ export default function NewOrderPage({
                 name="deliver-time"
                 id="later"
                 onChange={() => {
-                  setOrder((o) => ({ ...o, asap: false }))
+                  setOrder((o) => ({ ...o, asap: false }));
                 }}
               />
               <label htmlFor="later">Programar entrega</label>
@@ -272,7 +272,7 @@ export default function NewOrderPage({
                       deliveryDate: !e.target.value
                         ? undefined
                         : new Date(e.target.value),
-                    }))
+                    }));
                   }}
                 />
               </div>
@@ -286,8 +286,8 @@ export default function NewOrderPage({
           <div className="flex flex-col gap-3 w-full">
             <SelectField
               onChange={(value) => {
-                handleCityChange(value, 'pickupLocation')
-                handleCityChange(value, 'deliveryLocation')
+                handleCityChange(value, 'pickupLocation');
+                handleCityChange(value, 'deliveryLocation');
               }}
               data={cities}
               keyExtractor={(city) => city.id}
@@ -513,22 +513,22 @@ export default function NewOrderPage({
         </label>
       </div>
     </div>
-  )
+  );
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const citiesResData = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/cities`)
-  const cities = await citiesResData.json()
+  const citiesResData = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/cities`);
+  const cities = await citiesResData.json();
 
   const paymentMethodsResData = await fetch(
     `${process.env.NEXT_PUBLIC_URL}/api/payment/methods`
-  )
-  const paymentMethods = await paymentMethodsResData.json()
+  );
+  const paymentMethods = await paymentMethodsResData.json();
 
   return {
     props: {
       cities,
       paymentMethods,
     },
-  }
-}
+  };
+};

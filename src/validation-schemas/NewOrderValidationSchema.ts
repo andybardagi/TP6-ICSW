@@ -1,4 +1,4 @@
-import { object, string, number, date, boolean } from 'yup'
+import { object, string, number, date, boolean } from 'yup';
 export const NewOrderValidationSchema = object().shape({
   orderAmount: number()
     .min(0)
@@ -20,8 +20,8 @@ export const NewOrderValidationSchema = object().shape({
     .typeError('El pedido asap debe ser un booleano'),
   deliveryDate: date()
     .when('asap', (asap, schema) => {
-      if (!asap) return schema.required('La fecha de entrega es requerida')
-      return schema
+      if (!asap) return schema.required('La fecha de entrega es requerida');
+      return schema;
     })
     .typeError('La fecha de entrega debe ser una fecha'),
   deliveryLocation: object().shape({
@@ -125,11 +125,11 @@ export const NewOrderValidationSchema = object().shape({
       expirationYear: string(),
       cvc: string(),
     }).when('paymentType', (paymentType: any, schema) => {
-      if (paymentType === 'card') return schema.required('La tarjeta de crédito es requerida')
-      return schema
+      if (paymentType === 'card') return schema.required('La tarjeta de crédito es requerida');
+      return schema;
     }),
   }),
   bikerId: number(),
   status: string(),
   id: number(),
-})
+});
